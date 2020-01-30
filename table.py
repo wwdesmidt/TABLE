@@ -21,6 +21,8 @@ drawing_start_x = 0
 drawing_start_y = 0
 
 #print some instructions
+font=("TkDefaultFont", 14)
+table_top.create_text(root.winfo_screenwidth()/2, (root.winfo_screenheight()/2)-30, text=f"table", font=("TkDefaultFont", 24))
 table_top.create_text(root.winfo_screenwidth()/2, (root.winfo_screenheight()/2)+15, text=f"left click to measure distance")
 table_top.create_text(root.winfo_screenwidth()/2, (root.winfo_screenheight()/2)+30, text=f"right click to draw")
 table_top.create_text(root.winfo_screenwidth()/2, (root.winfo_screenheight()/2)+45, text=f"double right click to clear drawing")
