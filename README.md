@@ -1,9 +1,13 @@
 # TABLE
 
-possible names:
+Possible names:
+- Tech/Analog Battle Layout Exhibitor
+- Tabletop Advanced Battle Layour Environment
+- Tabletop Alternative Battle Layour Environment
 
-Tech/Analog Battle Layout Exhibitor
+## Testing instructions
+1. Install python
 
-Tabletop Advanced Battle Layour Environment
+You can get it here: https://www.python.org/downloads/
 
-Tabletop Alternative Battle Layour Environment
+Make sure that you check the "Add python to environment variables" option
