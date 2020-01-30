@@ -9,10 +9,11 @@ Possible names:
 Write a cool summary here!
 
 Some points about the project:
-- It is meant to run on a table with a screen in it
 - It will be simple
+- It is meant to run on a table with a screen in it
 - It embraces the fact that a lot of gaming is done on the fly. You don't need to have all your maps pre-made digitaly before you can play to use this. it will have some basic drawing functions
 - It is meant to supplement your current style, not replace it. Like using paper? Put a peice of paper on top of it. Maybe you can make the screen a solid color (blue for the ocean?) and add some background noise sound effects to deepen your experience. 
+- What else?
 
 ---
 
