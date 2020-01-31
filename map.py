@@ -5,6 +5,7 @@ from pathlib import Path, PurePath
 class Map():
     def __init__(self, file_name, canvas):
 
+        print(f"map class got file name: {file_name}")
 
         #map files and height and width in feet
         #eventually these will be bundled
@@ -21,6 +22,8 @@ class Map():
         
         path = Path(file_name).parents[0]
 
+        print(f"map class got path: {path}")
+
         #get the width and height out of the json file
         with open(file_name) as f:
             data = json.load(f)
@@ -28,11 +31,14 @@ class Map():
             self.map_width_feet = data["width_feet"]
             self.map_height_feet  = data["height_feet"]
 
-
+        print(f"map class got image file name: {self.image_file_name}")
+        print(f"map class got map dimensions: {self.map_width_feet},{self.map_height_feet}")
 
         self.map_image = Image.open(self.image_file_name)
         #self.map_width_feet = 9950000
         #self.map_height_feet  = 7550000
+
+        print(f"map class got image: {self.map_image}")
 
         #rotate the image to fill the screen best
         #supports landscape and portrait monitors
@@ -73,7 +79,7 @@ class Map():
         #get the photoimage after transformations
         self.map = ImageTk.PhotoImage(self.map_image)
 
-        #self.canvas.create_image(self.canvas.winfo_screenwidth()/2, self.canvas.winfo_screenheight()/2,image=self.map)
+        self.canvas.create_image(self.canvas.winfo_screenwidth()/2, self.canvas.winfo_screenheight()/2,image=self.map)
 
 
         #now that the map is created and resized, calculate feet pet pixel

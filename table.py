@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog
 import time
 import math
 from PIL import Image, ImageTk
@@ -50,6 +51,13 @@ def load_small_map():
     map = Map("./sample_assets/sample_dungeon_map.json", table_top)
     map.draw_map()
 
+def load_map():
+    global map
+    file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file")
+    print(f"load map function got file name: {file.name}")
+    map = Map(file.name, table_top)
+    map.draw_map()
+
 
 # create a popup menu
 menu = tk.Menu(root, tearoff=0)
@@ -57,6 +65,7 @@ menu.add_command(label="Draw", command=set_draw_mode)
 menu.add_command(label="Move", command=set_move_mode)
 menu.add_command(label="Sample Map: Large", command=load_large_map)
 menu.add_command(label="Sample Map: Small", command=load_small_map)
+menu.add_command(label="Load Map", command=load_map)
 menu.add_command(label="Exit", command=root.quit)
 
 def popup(event):
@@ -68,11 +77,6 @@ def popup(event):
 
 
 
-#map = Map("./sample_assets/sample_world_map.jpg", table_top)
-#map.draw_map()
-
-
-#table_top.create_image(table_top.winfo_screenwidth()/2, table_top.winfo_screenheight()/2,image=map.map)
 
 #Start input section
 ###############################################################################################
