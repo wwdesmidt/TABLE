@@ -29,17 +29,21 @@ table_top.pack()
 #determines what happens with the left mouse button
 mode = "move"
 map = None
+draw_color="black"
+draw_width=5
 
 #start menu section
 ###############################################################################################
 
-def set_draw_mode(): 
-    global mode
-    mode="draw"
 
-def set_move_mode():
+
+def set_mode():
     global mode
-    mode="move"
+    mode=mode_selection.get()
+
+def set_draw_color():
+    global draw_color
+    draw_color=color_selection.get()
 
 def load_large_map():
     global map
@@ -54,19 +58,51 @@ def load_small_map():
 def load_map():
     global map
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file")
-    print(f"load map function got file name: {file.name}")
     map = Map(file.name, table_top)
     map.draw_map()
 
+def clear_drawing():
+    destroy_by_tag("drawn_line")
 
+
+    
 # create a popup menu
+
+
+
+
 menu = tk.Menu(root, tearoff=0)
-menu.add_command(label="Draw", command=set_draw_mode)
-menu.add_command(label="Move", command=set_move_mode)
-menu.add_command(label="Sample Map: Large", command=load_large_map)
-menu.add_command(label="Sample Map: Small", command=load_small_map)
+samples_menu = tk.Menu(menu, tearoff=0)
+draw_colors_menu = tk.Menu(menu, tearoff=0)
+
+
+#menu.add_command(label="Move", command=set_move_mode)
+#menu.add_command(label="Draw", command=set_draw_mode)
+
+
+
+mode_selection = tk.StringVar()
+color_selection = tk.StringVar()
+
+menu.add_radiobutton(label="Move", variable=mode_selection, value="move", command=set_mode)
+menu.add_radiobutton(label="Draw", variable=mode_selection, value="draw", command=set_mode)
+
+menu.add_command(label="Clear Drawing", command=clear_drawing)
+
+menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
 menu.add_command(label="Load Map", command=load_map)
+menu.add_cascade(label="Samples", menu=samples_menu)
+menu.add_separator()
 menu.add_command(label="Exit", command=root.quit)
+
+
+samples_menu.add_command(label="Sample Map: Small", command=load_small_map)
+samples_menu.add_command(label="Sample Map: Large", command=load_large_map)
+
+draw_colors_menu.add_radiobutton(label="black", variable=color_selection, value="black", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="red", variable=color_selection, value="red", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="green", variable=color_selection, value="green", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="blue", variable=color_selection, value="blue", command=set_draw_color)
 
 def popup(event):
     menu.post(event.x_root, event.y_root)
@@ -150,7 +186,7 @@ def left_mouse_button_drag_draw(event):
     global drawing_start_y
     
     #draw a line from where the mouse was last time it moved until now
-    table_top.create_line(drawing_start_x, drawing_start_y, event.x, event.y, tag="drawn_line")
+    table_top.create_line(drawing_start_x, drawing_start_y, event.x, event.y, width=draw_width, fill=draw_color, tag="drawn_line")
 
     #set the starting position for next time with the ending position this time
     drawing_start_x = event.x
