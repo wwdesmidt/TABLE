@@ -2,6 +2,9 @@ import tkinter as tk
 import time
 import math
 from PIL import Image, ImageTk
+from map import Map
+from PIL import Image, ImageTk
+import json
 
 #try to set windows dpi awareness
 #if it doesnt work (like if you arent on windows) just do nothing
@@ -20,8 +23,11 @@ root.attributes("-fullscreen", True)
 table_top = tk.Canvas(root, width = root.winfo_screenwidth(), height = root.winfo_screenheight(), background="black", highlightthickness=0)
 table_top.pack()
 
-
+#local variables
+#the current mode
+#determines what happens with the left mouse button
 mode = "move"
+map = None
 
 #start menu section
 ###############################################################################################
@@ -34,10 +40,23 @@ def set_move_mode():
     global mode
     mode="move"
 
+def load_large_map():
+    global map
+    map = Map("./sample_assets/sample_world_map.json", table_top)
+    map.draw_map()
+
+def load_small_map():
+    global map
+    map = Map("./sample_assets/sample_dungeon_map.json", table_top)
+    map.draw_map()
+
+
 # create a popup menu
 menu = tk.Menu(root, tearoff=0)
 menu.add_command(label="Draw", command=set_draw_mode)
 menu.add_command(label="Move", command=set_move_mode)
+menu.add_command(label="Sample Map: Large", command=load_large_map)
+menu.add_command(label="Sample Map: Small", command=load_small_map)
 menu.add_command(label="Exit", command=root.quit)
 
 def popup(event):
@@ -49,79 +68,11 @@ def popup(event):
 
 
 
-#Start map section
-###############################################################################################
-
-#map files and height and width in feet
-#eventually these will be bundled
-#maybe an image file + some json or xml with matching names?
-#distances in feet even for large maps (require units and add auto conversion?)
-
-#map_image = Image.open("./sample_assets/sample_dungeon_map.jpg")
-#map_width_feet = 105
-#map_height_feet  = 135
-
-map_image = Image.open("./sample_assets/sample_world_map.jpg")
-map_width_feet = 9950000
-map_height_feet  = 7550000
+#map = Map("./sample_assets/sample_world_map.jpg", table_top)
+#map.draw_map()
 
 
-
-
-
-
-
-#rotate the image to fill the screen best
-#supports landscape and portrait monitors
-if root.winfo_screenwidth() > root.winfo_screenheight():
-    if map_image.height > map_image.width:
-        map_image = map_image.rotate(90, expand=True)
-        tmp = map_width_feet
-        map_width_feet = map_height_feet
-        map_height_feet = tmp
-else:
-    if map_image.height < map_image.width:
-        map_image = map_image.rotate(90, expand=True)
-        tmp = map_width_feet
-        map_width_feet = map_height_feet
-        map_height_feet = tmp
-
-
-#get the aspect ratios of the screen and the map
-screen_aspect_ratio = root.winfo_screenwidth()/root.winfo_screenheight()
-map_aspect_ratio = map_image.width/map_image.height
-
-#if the map is taller than the screen
-#resize height to screen height, and resize width based on image aspect ratio
-if map_aspect_ratio < screen_aspect_ratio:
-    map_new_height = root.winfo_screenheight()
-    map_new_width = int(map_new_height*(map_image.width/map_image.height))
-#otherwise do it the other way
-else:
-    map_new_width =  root.winfo_screenwidth()
-    map_new_height = int(map_new_width*(map_image.height/map_image.width))
-
-
-max_map_size = (map_new_width, map_new_height)
-map_image = map_image.resize(max_map_size)
-
-
-#get the photoimage after transformations
-map = ImageTk.PhotoImage(map_image)
-
-table_top.create_image(root.winfo_screenwidth()/2, root.winfo_screenheight()/2,image=map)
-
-
-#now that the map is created and resized, calculate feet pet pixel
-#could use height or width, using an average of the two for now incase ratios are off
-map_feet_per_pixel = ((map_height_feet /map_image.height) + (map_width_feet /map_image.width))/2
-
-
-#End map section
-###############################################################################################
-
-
-
+#table_top.create_image(table_top.winfo_screenwidth()/2, table_top.winfo_screenheight()/2,image=map.map)
 
 #Start input section
 ###############################################################################################
@@ -134,9 +85,7 @@ draging_distance_start_y = 0
 drawing_start_x = 0
 drawing_start_y = 0
 
-#keybindings and event handlers (hopefully can move these to a different file?)
-def exit(event):
-    root.quit()
+
 
 def left_mouse_button_press(event):
     if mode=="move":
@@ -170,7 +119,7 @@ def left_mouse_button_drag_move(event):
     #calculate the distance between the starting point and the current point
     dist = math.sqrt((event.x - draging_distance_start_x)**2 + (event.y - draging_distance_start_y)**2)
     #add in calculation for feet per pixel
-    dist = dist*map_feet_per_pixel
+    dist = dist*map.map_feet_per_pixel
 
     #miles or feet
     #we'll change over at 1/4 mile and see how that works
