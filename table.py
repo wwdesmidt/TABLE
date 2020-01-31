@@ -57,7 +57,7 @@ def load_small_map():
 
 def load_map():
     global map
-    file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file")
+    file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("JSON Files", "*.json"),("All Files","*.*")))
     map = Map(file.name, table_top)
     map.draw_map()
 
@@ -254,6 +254,9 @@ root.bind_all("<ButtonRelease-3>", popup)
 #end map section
 ###############################################################################################
 
+#load title screen
+map = Map("./sample_assets/title_screen.json", table_top)
+map.draw_map()
 
 
 table_top.mainloop()
