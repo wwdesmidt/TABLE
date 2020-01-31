@@ -30,7 +30,7 @@ table_top.pack()
 mode = "move"
 map = None
 draw_color="black"
-draw_width=5
+draw_width=3
 
 #start menu section
 ###############################################################################################
@@ -65,7 +65,7 @@ def clear_drawing():
     destroy_by_tag("drawn_line")
 
 
-    
+
 # create a popup menu
 
 
