@@ -3,6 +3,13 @@ import time
 import math
 from PIL import Image, ImageTk
 
+#try to set windows dpi awareness
+#if it doesnt work (like if you arent on windows) just do nothing
+try:
+    from ctypes import windll
+    windll.shcore.SetProcessDpiAwareness(1)
+except:
+    pass
 
 #full screen root window
 root = tk.Tk()
