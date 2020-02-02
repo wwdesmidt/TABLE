@@ -47,17 +47,17 @@ def set_draw_color():
 
 def load_large_map():
     global map
-    map = Map("./sample_assets/sample_world_map.json", table_top)
+    map = Map("./sample_assets/sample_world_map.jpg", table_top)
     map.draw_map()
 
 def load_small_map():
     global map
-    map = Map("./sample_assets/sample_dungeon_map.json", table_top)
+    map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
     map.draw_map()
 
 def load_map():
     global map
-    file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("JSON Files", "*.json"),("All Files","*.*")))
+    file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
     map = Map(file.name, table_top)
     map.draw_map()
 
@@ -255,7 +255,7 @@ root.bind_all("<ButtonRelease-3>", popup)
 ###############################################################################################
 
 #load title screen
-map = Map("./sample_assets/title_screen.json", table_top)
+map = Map("./sample_assets/title_screen.png", table_top)
 map.draw_map()
 
 
