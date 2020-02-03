@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 from map import Map
 from PIL import Image, ImageTk
 import json
+from measure_box import MeasureBox
 
 #try to set windows dpi awareness
 #if it doesnt work (like if you arent on windows) just do nothing
@@ -24,13 +25,36 @@ root.attributes("-fullscreen", True)
 table_top = tk.Canvas(root, width = root.winfo_screenwidth(), height = root.winfo_screenheight(), background="black", highlightthickness=0)
 table_top.pack()
 
-#local variables
+#start variable section
+###############################################################################################
 #the current mode
 #determines what happens with the left mouse button
 mode = "move"
+
+#the current map object
 map = None
+
+#values for drawing
 draw_color="black"
 draw_width=3
+
+#strarting position for dragging distance
+draging_distance_start_x = 0
+draging_distance_start_y = 0
+
+#starting position for drawing
+drawing_start_x = 0
+drawing_start_y = 0
+
+#values for setting distance scale
+distance_scale_feet = 0
+scale_start_x = 0
+scale_start_y = 0
+scale_end_x = 0
+scale_end_y = 0
+
+#end variable section
+###############################################################################################
 
 #start menu section
 ###############################################################################################
@@ -45,21 +69,42 @@ def set_draw_color():
     global draw_color
     draw_color=color_selection.get()
 
+'''
 def load_large_map():
     global map
     map = Map("./sample_assets/sample_world_map.jpg", table_top)
     map.draw_map()
+'''
 
+'''
 def load_small_map():
     global map
     map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
     map.draw_map()
+'''
 
 def load_map():
     global map
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
     map = Map(file.name, table_top)
     map.draw_map()
+
+def set_distance_scale():
+    global distance_scale_feet
+    global mode
+    #pop up the distance scale box to get the distance in feet
+    measure_box = MeasureBox(root)
+    root.wait_window(measure_box.top)
+
+    #set the local scale variable
+    distance_scale_feet = measure_box.result
+
+    #if the user didnt click cancel
+    if not distance_scale_feet == None:
+        #set the mode
+        mode = "scale"
+        #print instructions (if they picked miles this is gonna be messed up)
+        table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"Draw a line that is {distance_scale_feet} feet long", tag="scale_text", anchor="center")
 
 def clear_drawing():
     destroy_by_tag("drawn_line")
@@ -72,7 +117,7 @@ def clear_drawing():
 
 
 menu = tk.Menu(root, tearoff=0)
-samples_menu = tk.Menu(menu, tearoff=0)
+map_tools_menu = tk.Menu(menu, tearoff=0)
 draw_colors_menu = tk.Menu(menu, tearoff=0)
 
 
@@ -90,14 +135,15 @@ menu.add_radiobutton(label="Draw", variable=mode_selection, value="draw", comman
 menu.add_command(label="Clear Drawing", command=clear_drawing)
 
 menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
-menu.add_command(label="Load Map", command=load_map)
-menu.add_cascade(label="Samples", menu=samples_menu)
+
+menu.add_cascade(label="Map ...", menu=map_tools_menu)
 menu.add_separator()
 menu.add_command(label="Exit", command=root.quit)
 
-
-samples_menu.add_command(label="Sample Map: Small", command=load_small_map)
-samples_menu.add_command(label="Sample Map: Large", command=load_large_map)
+map_tools_menu.add_command(label="Load Map", command=load_map)
+#map_tools_menu.add_command(label="Sample Map: Small", command=load_small_map)
+#map_tools_menu.add_command(label="Sample Map: Large", command=load_large_map)
+map_tools_menu.add_command(label="Set Distance Scale", command=set_distance_scale)
 
 draw_colors_menu.add_radiobutton(label="black", variable=color_selection, value="black", command=set_draw_color)
 draw_colors_menu.add_radiobutton(label="red", variable=color_selection, value="red", command=set_draw_color)
@@ -117,14 +163,6 @@ def popup(event):
 #Start input section
 ###############################################################################################
 
-#strarting position for dragging distance
-draging_distance_start_x = 0
-draging_distance_start_y = 0
-
-#starting position for drawing
-drawing_start_x = 0
-drawing_start_y = 0
-
 
 
 def left_mouse_button_press(event):
@@ -132,6 +170,8 @@ def left_mouse_button_press(event):
         left_mouse_button_press_move(event)
     elif mode=="draw":
         left_mouse_button_press_draw(event)
+    elif mode=="scale":
+        left_mouse_button_press_scale(event)
 
 def left_mouse_button_press_move(event):
         #get the global variables for where we are starting and set them to where the left button was pressed
@@ -147,6 +187,12 @@ def left_mouse_button_press_draw(event):
     drawing_start_x = event.x
     drawing_start_y = event.y
 
+def left_mouse_button_press_scale(event):
+    global scale_start_x
+    global scale_start_y
+    scale_start_x = event.x
+    scale_start_y = event.y
+
 
 
 def left_mouse_button_drag(event):
@@ -154,6 +200,8 @@ def left_mouse_button_drag(event):
         left_mouse_button_drag_move(event)
     elif mode=="draw":
         left_mouse_button_drag_draw(event)
+    elif mode=="scale":
+        left_mouse_button_drag_scale(event)
 
 def left_mouse_button_drag_move(event):
     #calculate the distance between the starting point and the current point
@@ -192,12 +240,21 @@ def left_mouse_button_drag_draw(event):
     drawing_start_x = event.x
     drawing_start_y = event.y
 
+def left_mouse_button_drag_scale(event):
+    global scale_end_x
+    global scale_end_y
+    scale_end_x = event.x
+    scale_end_y = event.y
+    destroy_by_tag("scale_line")
+    table_top.create_line(scale_start_x, scale_start_y, scale_end_x, scale_end_y, width=1, fill="black", tag="scale_line")
 
 def left_mouse_button_release(event):
     if mode=="move":
         left_mouse_button_release_move(event)
     elif mode=="draw":
         left_mouse_button_release_draw(event)
+    elif mode=="scale":
+        left_mouse_button_release_scale(event)
 
 def left_mouse_button_release_move(event):
     #the user let go of the left mouse button, delete the distance line and text
@@ -208,6 +265,17 @@ def left_mouse_button_release_draw(event):
     #dont need to do anything right now when the user lets go of the mouse button while drawing
     pass
 
+def left_mouse_button_release_scale(event):
+    global mode
+    #print("user finished dragging a scale")
+    destroy_by_tag("scale_line")
+    destroy_by_tag("scale_text")
+    dist = math.sqrt((scale_end_x - scale_start_x)**2 + (scale_end_y - scale_start_y)**2)
+    #print(f"user dragged {dist} px")
+    #print(f"scale is {dist/distance_scale_feet} pixels per foot")
+    map.set_distance(dist/distance_scale_feet)
+    mode="move"
+    
 
 
 def right_mouse_button_press(event):
