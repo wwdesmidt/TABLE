@@ -102,3 +102,42 @@ class Map():
     #simple method to just draw the map
     def draw_map(self):
         self.canvas.create_image(self.canvas.winfo_screenwidth()/2, self.canvas.winfo_screenheight()/2,image=self.map)
+
+    #use a pixels per foot measurement from the main app to update 
+    # the height and width of the map in the json file
+    def set_distance(self, pixels_per_foot):
+
+        print(f"width:  {pixels_per_foot} / {self.map_new_width} = {pixels_per_foot/self.map_new_width}")
+        print(f"height: {pixels_per_foot} / {self.map_new_height} = {pixels_per_foot/self.map_new_height}")
+
+        print(f"width:  {self.map_new_width} / {pixels_per_foot}  = {self.map_new_width/pixels_per_foot}")
+        print(f"height: {self.map_new_height} / {pixels_per_foot}  = {self.map_new_height/pixels_per_foot}")
+        
+        #set the new values to the class member variables 
+        # so they take immediately
+        #self.map_width_feet = round(pixels_per_foot/self.map_new_width)
+        #self.map_height_feet = round(pixels_per_foot/self.map_new_height)
+        self.map_width_feet = round(self.map_new_width/pixels_per_foot)
+        self.map_height_feet = round(self.map_new_height/pixels_per_foot)
+
+
+
+        #open the current json file and pull out the data
+        with open(self.json_file, "r") as f:
+            json_data = json.load(f)
+
+        print(json_data)
+
+        #update the width and height
+        json_data["width_feet"] = self.map_width_feet
+        json_data["height_feet"] = self.map_height_feet
+
+        print(json_data)
+
+        #write the new values back to the file
+        with open(self.json_file, "w") as f:
+            json.dump(json_data,f)
+
+        #finally recalculate pixels per feet for the current instance
+        self.map_feet_per_pixel = self.map_width_feet / self.map_image.width
+
