@@ -34,6 +34,49 @@ mode = "move"
 #the current map object
 map = None
 
+
+###################################temporary token section
+#tokens list (single non class one at first)
+token_x = 1000
+token_y = 500
+#radius is in feet
+token_rad = 2.5
+token_moving = False
+
+def draw_token():
+    token_rad_px = token_rad/map.map_feet_per_pixel
+    
+    x1 = token_x - token_rad_px
+    y1 = token_y - token_rad_px
+    x2 = token_x + token_rad_px
+    y2 = token_y + token_rad_px
+    table_top.create_oval(x1,y1,x2,y2, fill="green", width="5", tag="token")
+
+def is_in_token(x,y):
+    token_rad_px = token_rad/map.map_feet_per_pixel
+
+    x1 = token_x - (token_rad_px)
+    y1 = token_y - (token_rad_px)
+    x2 = token_x + (token_rad_px)
+    y2 = token_y + (token_rad_px)
+
+    if x > x1 and x < x2 and y > y1 and y < y2:
+        return True
+    else:
+        return False
+
+def move_token(x,y):
+    global token_x
+    global token_y
+    token_x = x
+    token_y = y
+    table_top.delete(table_top.find_withtag("token"))
+    draw_token()
+
+
+
+###################################temporary token section
+
 #values for drawing
 draw_color="black"
 draw_width=3
@@ -138,6 +181,8 @@ menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
 
 menu.add_cascade(label="Map ...", menu=map_tools_menu)
 menu.add_separator()
+menu.add_command(label="Draw a test token", command = draw_token)
+menu.add_separator()
 menu.add_command(label="Exit", command=root.quit)
 
 map_tools_menu.add_command(label="Load Map", command=load_map)
@@ -179,6 +224,10 @@ def left_mouse_button_press_move(event):
         global draging_distance_start_y
         draging_distance_start_x = event.x
         draging_distance_start_y = event.y
+
+        if is_in_token(event.x,event.y):
+            global token_moving
+            token_moving = True
 
 def left_mouse_button_press_draw(event):
     #get the global variables for where we are starting and set them to where the left button was pressed
@@ -227,6 +276,9 @@ def left_mouse_button_drag_move(event):
     table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, tag = "dragging_distance_line")
     table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_text", anchor="w")
 
+    if token_moving == True:
+        move_token(event.x, event.y)
+
 
 def left_mouse_button_drag_draw(event):
     #get global variables for where the mouse is moving from
@@ -260,6 +312,9 @@ def left_mouse_button_release_move(event):
     #the user let go of the left mouse button, delete the distance line and text
     table_top.delete(table_top.find_withtag("dragging_distance_line"))
     table_top.delete(table_top.find_withtag("dragging_distance_text"))
+
+    global token_moving
+    token_moving = False
 
 def left_mouse_button_release_draw(event):
     #dont need to do anything right now when the user lets go of the mouse button while drawing
@@ -323,8 +378,10 @@ root.bind_all("<ButtonRelease-3>", popup)
 ###############################################################################################
 
 #load title screen
-map = Map("./sample_assets/title_screen.png", table_top)
+map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
 map.draw_map()
 
+
+#draw_token()
 
 table_top.mainloop()
