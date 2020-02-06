@@ -4,9 +4,9 @@ import time
 import math
 from PIL import Image, ImageTk
 from map import Map
-from PIL import Image, ImageTk
 import json
 from measure_box import MeasureBox
+from game_token import GameToken
 
 #try to set windows dpi awareness
 #if it doesnt work (like if you arent on windows) just do nothing
@@ -33,6 +33,12 @@ mode = "move"
 
 #the current map object
 map = None
+
+#a list of tokens
+tokens = set()
+moving_tokens = set()
+
+
 
 #values for drawing
 draw_color="black"
@@ -69,19 +75,6 @@ def set_draw_color():
     global draw_color
     draw_color=color_selection.get()
 
-'''
-def load_large_map():
-    global map
-    map = Map("./sample_assets/sample_world_map.jpg", table_top)
-    map.draw_map()
-'''
-
-'''
-def load_small_map():
-    global map
-    map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
-    map.draw_map()
-'''
 
 def load_map():
     global map
@@ -110,7 +103,6 @@ def clear_drawing():
     destroy_by_tag("drawn_line")
 
 
-
 # create a popup menu
 
 
@@ -137,6 +129,8 @@ menu.add_command(label="Clear Drawing", command=clear_drawing)
 menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
 
 menu.add_cascade(label="Map ...", menu=map_tools_menu)
+menu.add_separator()
+#menu.add_command(label="Draw a test token", command = draw_token)
 menu.add_separator()
 menu.add_command(label="Exit", command=root.quit)
 
@@ -179,6 +173,13 @@ def left_mouse_button_press_move(event):
         global draging_distance_start_y
         draging_distance_start_x = event.x
         draging_distance_start_y = event.y
+
+        for token in tokens:
+            if token.contains(event.x, event.y):
+                global token_moving
+                token_moving = True
+                moving_tokens.add(token)
+
 
 def left_mouse_button_press_draw(event):
     #get the global variables for where we are starting and set them to where the left button was pressed
@@ -227,6 +228,10 @@ def left_mouse_button_drag_move(event):
     table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, tag = "dragging_distance_line")
     table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_text", anchor="w")
 
+    if token_moving == True:
+        for token in moving_tokens:
+            token.move(event.x, event.y)
+
 
 def left_mouse_button_drag_draw(event):
     #get global variables for where the mouse is moving from
@@ -260,6 +265,11 @@ def left_mouse_button_release_move(event):
     #the user let go of the left mouse button, delete the distance line and text
     table_top.delete(table_top.find_withtag("dragging_distance_line"))
     table_top.delete(table_top.find_withtag("dragging_distance_text"))
+
+    global token_moving
+    token_moving = False
+
+    moving_tokens.clear()
 
 def left_mouse_button_release_draw(event):
     #dont need to do anything right now when the user lets go of the mouse button while drawing
@@ -323,8 +333,27 @@ root.bind_all("<ButtonRelease-3>", popup)
 ###############################################################################################
 
 #load title screen
-map = Map("./sample_assets/title_screen.png", table_top)
+map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
 map.draw_map()
 
+
+###################################temporary token section
+
+
+#test_token = GameToken("not_used_yet", table_top, map)
+
+
+tokens.add(GameToken("sample_assets/rogue.png", table_top, map,400,300,1.75,"green"))
+tokens.add(GameToken("sample_assets/sorcerer.png", table_top, map,400,400,2.5,"green"))
+tokens.add(GameToken("sample_assets/druid.png", table_top, map,400,500,2.5,"green"))
+tokens.add(GameToken("sample_assets/beholder.png", table_top, map,1200,800,15,"red"))
+
+for token in tokens:
+    token.draw()
+
+###################################temporary token section
+
+
+#draw_token()
 
 table_top.mainloop()

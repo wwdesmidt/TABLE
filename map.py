@@ -50,7 +50,9 @@ class Map():
         #self.map_width_feet = 9950000
         #self.map_height_feet  = 7550000
 
-
+        #need to keep track of if we rotated the map, because if we did
+        #we need to write the scale backwards
+        self.rotated = False
 
         #rotate the image to fill the screen best
         #supports landscape and portrait monitors
@@ -60,12 +62,14 @@ class Map():
                 self._tmp = self.map_width_feet
                 self.map_width_feet = self.map_height_feet
                 self.map_height_feet = self._tmp
+                self.rotated = True
         else:
             if self.map_image.height < self.map_image.width:
                 self.map_image = self.map_image.rotate(90, expand=True)
                 self._tmp = self.map_width_feet
                 self.map_width_feet = self.map_height_feet
                 self.map_height_feet = self._tmp
+                self.rotated = True
 
         #get the aspect ratios of the screen and the map
         self.screen_aspect_ratio = self.canvas.winfo_screenwidth()/self.canvas.winfo_screenheight()
@@ -107,11 +111,11 @@ class Map():
     # the height and width of the map in the json file
     def set_distance(self, pixels_per_foot):
 
-        print(f"width:  {pixels_per_foot} / {self.map_new_width} = {pixels_per_foot/self.map_new_width}")
-        print(f"height: {pixels_per_foot} / {self.map_new_height} = {pixels_per_foot/self.map_new_height}")
+        #print(f"width:  {pixels_per_foot} / {self.map_new_width} = {pixels_per_foot/self.map_new_width}")
+        #print(f"height: {pixels_per_foot} / {self.map_new_height} = {pixels_per_foot/self.map_new_height}")
 
-        print(f"width:  {self.map_new_width} / {pixels_per_foot}  = {self.map_new_width/pixels_per_foot}")
-        print(f"height: {self.map_new_height} / {pixels_per_foot}  = {self.map_new_height/pixels_per_foot}")
+        #print(f"width:  {self.map_new_width} / {pixels_per_foot}  = {self.map_new_width/pixels_per_foot}")
+        #print(f"height: {self.map_new_height} / {pixels_per_foot}  = {self.map_new_height/pixels_per_foot}")
         
         #set the new values to the class member variables 
         # so they take immediately
@@ -126,13 +130,18 @@ class Map():
         with open(self.json_file, "r") as f:
             json_data = json.load(f)
 
-        print(json_data)
+        #print(json_data)
 
         #update the width and height
-        json_data["width_feet"] = self.map_width_feet
-        json_data["height_feet"] = self.map_height_feet
+        #(backwards if we rotated the map when displaying it)
+        if self.rotated == True:
+            json_data["height_feet"] = self.map_width_feet
+            json_data["width_feet"] = self.map_height_feet
+        else:
+            json_data["width_feet"] = self.map_width_feet
+            json_data["height_feet"] = self.map_height_feet
 
-        print(json_data)
+        #print(json_data)
 
         #write the new values back to the file
         with open(self.json_file, "w") as f:
