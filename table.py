@@ -343,9 +343,9 @@ map.draw_map()
 #test_token = GameToken("not_used_yet", table_top, map)
 
 
-tokens.add(GameToken("not_used_yet", table_top, map,200,200,2.5,"red"))
-tokens.add(GameToken("not_used_yet", table_top, map,300,300,2.5,"green"))
-tokens.add(GameToken("not_used_yet", table_top, map,400,400,5,"blue"))
+tokens.add(GameToken("sample_assets/rogue.png", table_top, map,300,300,2.5,"green"))
+tokens.add(GameToken("sample_assets/rogue.png", table_top, map,400,400,5,"blue"))
+tokens.add(GameToken("sample_assets/rogue.png", table_top, map,600,600,20,"red"))
 
 for token in tokens:
     token.draw()
