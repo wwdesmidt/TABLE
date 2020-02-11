@@ -81,14 +81,26 @@ def set_draw_color():
 
 
 def load_map():
+    #get access to the map locally
     global map
+    #file dialog to open a map image
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
+    #create map instance
     map = Map(file.name, table_top)
+    #draw the map
     map.draw_map()
 
 def add_token():
-    tokens.add(GameToken("sample_assets/rogue.png", table_top, map,right_click_x,right_click_y,1.75,"green")) 
+    #file dialog to load token image
+    file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
 
+    #create a token where the right click was
+    #hard coded to 5 feet green for now
+    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,2.5,"green")) 
+
+    #redraw tokens  so the new one shows up
+    # (will this cause all the other tokens to be doubled until they move again? 
+    # maybe add a redraw function to token class that removes it first)
     for token in tokens:
         token.draw()
 
@@ -357,22 +369,6 @@ root.bind_all("<ButtonRelease-3>", popup)
 map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
 map.draw_map()
 
-
-###################################temporary token section
-
-
-#test_token = GameToken("not_used_yet", table_top, map)
-
-
-tokens.add(GameToken("sample_assets/rogue.png", table_top, map,400,300,1.75,"green"))
-tokens.add(GameToken("sample_assets/sorcerer.png", table_top, map,400,400,2.5,"green"))
-tokens.add(GameToken("sample_assets/druid.png", table_top, map,400,500,2.5,"green"))
-tokens.add(GameToken("sample_assets/beholder.png", table_top, map,1200,800,15,"red"))
-
-for token in tokens:
-    token.draw()
-
-###################################temporary token section
 
 
 #draw_token()
