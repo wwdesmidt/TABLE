@@ -2,18 +2,53 @@ import tkinter as tk
 from map import Map
 import uuid
 from PIL import Image, ImageTk, ImageDraw
+import json
+import pathlib
+import os
+
 
 class GameToken:
-    def __init__(self, file_name, canvas, map, x, y, radius, color):
+    def __init__(self, file_name, canvas, map, x, y):
 
         #generate a unique id for this token 
         #so we can find it and delete it when we move it
         self.id = uuid.uuid4()
 
-        print(f"hi, im a token, my name is {self.id}")
+        #print(f"hi, im a token, my name is {self.id}")
 
         #file name for the image, not used yet
         self.file_name = file_name
+
+        #get the absolute path for the token image
+        self.image_file = pathlib.Path(self.file_name)
+
+        #get the absolute path the json file (rules are same file name same directory)
+        self.json_file = pathlib.Path(self.image_file.parent,self.image_file.stem+".json")
+
+        #if the json file doesnt exist yet initialize it
+        if not os.path.isfile(self.json_file):
+            #initial json data
+            #this needs to contain whatever is read below
+            initial_json_data = {
+                "image_file":self.image_file.name,
+                "radius":2.5,
+                "outline_color":"green"
+            }
+            with open(self.json_file, "w+") as f:
+                json.dump(initial_json_data,f)
+                print("didnt find a json file so made one")
+
+
+
+        #get the token image file name (dont know if we even need that
+        # and the radius and color in feet out of the json file
+        with open(self.json_file) as f:
+            data = json.load(f)
+            self.image_file_name = data["image_file"]
+            self.radius = data["radius"]
+            self.outline_color = data["outline_color"]
+
+
 
 
         #the canvas that we will draw the token on
@@ -23,7 +58,7 @@ class GameToken:
         self.map = map
 
         #radius, this will be read from a json file eventually
-        self.radius = radius
+        #self.radius = radius
         self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
 
         #where it is initially positioned... need to come up with something for this
@@ -31,7 +66,7 @@ class GameToken:
         self.y = y
 
         #outline color... also need to figure this out
-        self.outline_color = color
+        #self.outline_color = color
 
         #image processing stuff
         self.image = Image.open(self.file_name)
@@ -89,3 +124,7 @@ class GameToken:
         else:
             return False
 
+    def set_color(self, color):
+        self.outline_color = color
+        self.undraw()
+        self.draw()

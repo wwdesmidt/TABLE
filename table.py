@@ -37,6 +37,7 @@ map = None
 #a list of tokens
 tokens = set()
 moving_tokens = set()
+right_clicked_token = None
 
 
 #values for right click position
@@ -71,13 +72,83 @@ scale_end_y = 0
 
 
 
+
+
+#token popup menu
+def delete_token():
+    #get access to the tokens set
+    global tokens
+    global right_clicked_token
+
+    #get a set of tokens to delete (i think this should always be one?)
+    #tokens_to_delete = {token for token in tokens if token.contains(right_click_x,right_click_y)}
+
+    #undraw all the tokens (need this to get rid of colored borders)
+    #for token in tokens_to_delete:
+    #    token.undraw()
+
+    #remove the tokens to delete from the list of tokens
+    #tokens = tokens - tokens_to_delete
+
+
+    #so much easier now that i store the right clicked token!
+    right_clicked_token.undraw()
+    tokens.remove(right_clicked_token)
+    right_clicked_token = None
+
+
+#make this better eventually
+def set_token_color_red(): right_clicked_token.set_color("red")
+def set_token_color_orange(): right_clicked_token.set_color("orange")
+def set_token_color_yellow(): right_clicked_token.set_color("yellow")
+def set_token_color_green(): right_clicked_token.set_color("green")
+def set_token_color_blue(): right_clicked_token.set_color("blue")
+def set_token_color_indigo(): right_clicked_token.set_color("indigo")
+def set_token_color_violet(): right_clicked_token.set_color("violet")
+def set_token_color_black(): right_clicked_token.set_color("black")
+def set_token_color_white(): right_clicked_token.set_color("white")
+def set_token_color_grey(): right_clicked_token.set_color("grey")
+
+
+
+
+
+token_menu = tk.Menu(root, tearoff=0)
+token_size_menu = tk.Menu(token_menu, tearoff=0)
+token_color_menu = tk.Menu(token_menu, tearoff=0)
+
+
+
+token_menu.add_cascade(label = "Size ...", menu = token_size_menu)
+token_menu.add_cascade(label = "Color ...", menu = token_color_menu)
+token_menu.add_command(label = "Delete", command = delete_token)
+
+token_color_menu.add_command(label ="Red", command = set_token_color_red)
+token_color_menu.add_command(label ="Orange", command = set_token_color_orange)
+token_color_menu.add_command(label ="Yellow", command = set_token_color_yellow)
+token_color_menu.add_command(label ="Green", command = set_token_color_green)
+token_color_menu.add_command(label ="Blue", command = set_token_color_blue)
+token_color_menu.add_command(label ="Indigo", command = set_token_color_indigo)
+token_color_menu.add_command(label ="Violet", command = set_token_color_violet)
+token_color_menu.add_command(label ="Black", command = set_token_color_black)
+token_color_menu.add_command(label ="White", command = set_token_color_white)
+token_color_menu.add_command(label ="Grey", command = set_token_color_grey)
+
+
+
+
+
+
+
+
+#main popup menu
 def set_mode():
     global mode
     mode=mode_selection.get()
 
 def set_draw_color():
     global draw_color
-    draw_color=color_selection.get()
+    draw_color=draw_color_selection.get()
 
 
 def load_map():
@@ -96,7 +167,7 @@ def add_token():
 
     #create a token where the right click was
     #hard coded to 5 feet green for now
-    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,2.5,"green")) 
+    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,)) 
 
     #redraw tokens  so the new one shows up
     # (will this cause all the other tokens to be doubled until they move again? 
@@ -125,10 +196,6 @@ def clear_drawing():
     destroy_by_tag("drawn_line")
 
 
-# create a popup menu
-
-
-
 
 menu = tk.Menu(root, tearoff=0)
 map_tools_menu = tk.Menu(menu, tearoff=0)
@@ -142,7 +209,7 @@ draw_colors_menu = tk.Menu(menu, tearoff=0)
 
 
 mode_selection = tk.StringVar()
-color_selection = tk.StringVar()
+draw_color_selection = tk.StringVar()
 
 menu.add_radiobutton(label="Move", variable=mode_selection, value="move", command=set_mode)
 menu.add_radiobutton(label="Draw", variable=mode_selection, value="draw", command=set_mode)
@@ -165,10 +232,10 @@ map_tools_menu.add_command(label="Set Distance Scale", command=set_distance_scal
 
 token_tools_menu.add_command(label="Add Token", command=add_token)
 
-draw_colors_menu.add_radiobutton(label="black", variable=color_selection, value="black", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="red", variable=color_selection, value="red", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="green", variable=color_selection, value="green", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="blue", variable=color_selection, value="blue", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="black", variable=draw_color_selection, value="black", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="red", variable=draw_color_selection, value="red", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="green", variable=draw_color_selection, value="green", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="blue", variable=draw_color_selection, value="blue", command=set_draw_color)
 
 #right click mouse event (maybe could use a better name?)
 def popup(event):
@@ -178,7 +245,20 @@ def popup(event):
     right_click_x = event.x
     right_click_y = event.y
 
-    menu.post(event.x_root, event.y_root)
+    token_clicked = False
+
+    for token in tokens:
+        if token.contains(event.x, event.y):
+            global right_clicked_token
+            right_clicked_token = token
+            token_clicked = True
+            break
+
+
+    if token_clicked == True:
+        token_menu.post(event.x_root, event.y_root)
+    else:
+        menu.post(event.x_root, event.y_root)
 
 #end menu section
 ###############################################################################################
