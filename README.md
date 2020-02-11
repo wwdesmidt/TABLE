@@ -1,4 +1,4 @@
-## 2/10/2020 - Lot's of token changes
+## 2/10/2020 - Lots of token changes
 
 - You can now add tokens via an image file from the right click menu just like maps
 - Token size and outline color are stored in a json file, like map size is, so it carries between sessions. This also means that a dm can load up all their tokens once each and set them up and not have to worry about them anymore
