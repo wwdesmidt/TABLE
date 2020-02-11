@@ -1,3 +1,22 @@
+## 2/10/2020 - Lot's of token changes
+
+- You can now add tokens via an image file from the right click menu just like maps
+- Token size and outline color are stored in a json file, like map size is, so it carries between sessions. This also means that a dm can load up all their tokens once each and set them up and not have to worry about them anymore
+- Added a second right click menu for when you right click on a token. This allows you to:
+    - Change a tokens color. I added ROYGBIV plus white black and grey
+    - Change a tokens size. I added all the official DnD sizes plus one... extra... size. I also made small 4 ft instead of 5ft, almost entirely so halflings will look smaller on the screen :)
+    - Delete a token
+- Did some other small things
+    - Made a minimum token size... I don't know if its the best minimum token size, but its a minimum token size. It makes it so the app doesnt crash when you put a 5 ft. token on a 900 mile map, and the token ends up being 0 pixels on the screen
+    - Made it delete all the tokens when you change maps.
+    - There is now a dedicated variable for whatever the last token you right clicked was. This lets you cleanly color, size, and delete a single token. I want to do this for left clicking on tokens too, which will help with, but not solve, the issues I mentioned last time.
+    
+Issues:
+I need to make it so you can't load a token on a map with no size set.. like... really badly. Either that or make the default map size something decent like 100 feet or something. That's probably a good idea. Right now if you load a map, dont set the size, and the load a token, the token will be HUGE and fill the whole screen, and you'll have to crtl-alt-del or something?
+
+Some UI design philosophy stuff:
+So... for the colors and the sizes, I spent time making a seperate menu item for each one. This makes it easy to use everything with just a mouse, but it limits your options. You couldnt make a token thats exactly 42 feet, or have 9 rats that are all a slightly different shade of grey. I guess one solution could be to have popup windows with forms that you fill out (still using only a mouse but they could have more complex input options). What do you think, person who has no way to respond to this?
+
 ## 2/6/2020 - The beginnings of tokens
 
 Started writing update summaries... apparently?
