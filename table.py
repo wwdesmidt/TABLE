@@ -109,7 +109,17 @@ def set_token_color_black(): right_clicked_token.set_color("black")
 def set_token_color_white(): right_clicked_token.set_color("white")
 def set_token_color_grey(): right_clicked_token.set_color("grey")
 
-
+#radius so send half of size
+def set_token_size_fine(): right_clicked_token.set_redius(0.25)
+def set_token_size_diminutive(): right_clicked_token.set_redius(0.5)
+def set_token_size_tiny(): right_clicked_token.set_redius(1.25)
+def set_token_size_small(): right_clicked_token.set_redius(2)
+def set_token_size_medium(): right_clicked_token.set_redius(2.5)
+def set_token_size_large(): right_clicked_token.set_redius(5)
+def set_token_size_huge(): right_clicked_token.set_redius(7.5)
+def set_token_size_gargantuan(): right_clicked_token.set_redius(10)
+def set_token_size_colossal(): right_clicked_token.set_redius(15)
+def set_token_size_wtf(): right_clicked_token.set_redius(50)
 
 
 
@@ -123,22 +133,39 @@ token_menu.add_cascade(label = "Size ...", menu = token_size_menu)
 token_menu.add_cascade(label = "Color ...", menu = token_color_menu)
 token_menu.add_command(label = "Delete", command = delete_token)
 
-token_color_menu.add_command(label ="Red", command = set_token_color_red)
-token_color_menu.add_command(label ="Orange", command = set_token_color_orange)
-token_color_menu.add_command(label ="Yellow", command = set_token_color_yellow)
-token_color_menu.add_command(label ="Green", command = set_token_color_green)
-token_color_menu.add_command(label ="Blue", command = set_token_color_blue)
-token_color_menu.add_command(label ="Indigo", command = set_token_color_indigo)
-token_color_menu.add_command(label ="Violet", command = set_token_color_violet)
-token_color_menu.add_command(label ="Black", command = set_token_color_black)
-token_color_menu.add_command(label ="White", command = set_token_color_white)
-token_color_menu.add_command(label ="Grey", command = set_token_color_grey)
+token_color_menu.add_command(label = "Red", command = set_token_color_red, foreground="red")
+token_color_menu.add_command(label = "Orange", command = set_token_color_orange, foreground="orange")
+token_color_menu.add_command(label = "Yellow", command = set_token_color_yellow, foreground="yellow")
+token_color_menu.add_command(label = "Green", command = set_token_color_green, foreground="green")
+token_color_menu.add_command(label = "Blue", command = set_token_color_blue, foreground="blue")
+token_color_menu.add_command(label = "Indigo", command = set_token_color_indigo, foreground="indigo")
+token_color_menu.add_command(label = "Violet", command = set_token_color_violet, foreground="violet")
+token_color_menu.add_command(label = "Black", command = set_token_color_black, foreground="black")
+token_color_menu.add_command(label = "White", command = set_token_color_white, foreground="white")
+token_color_menu.add_command(label = "Grey", command = set_token_color_grey, foreground="grey")
+
+token_size_menu.add_command(label = "Fine (1/2 ft.)", command = set_token_size_fine)
+token_size_menu.add_command(label = "Diminutive (1 ft.)", command = set_token_size_diminutive)
+token_size_menu.add_command(label = "Tiny (2-1/2 ft.)", command = set_token_size_tiny)
+token_size_menu.add_command(label = "Small (4 ft.)", command = set_token_size_small)
+token_size_menu.add_command(label = "Medium (5 ft.)", command = set_token_size_medium)
+token_size_menu.add_command(label = "Large (10 ft.)", command = set_token_size_large)
+token_size_menu.add_command(label = "Huge (15 ft.)", command = set_token_size_huge)
+token_size_menu.add_command(label = "Gargantuan (20 ft.)", command = set_token_size_gargantuan)
+token_size_menu.add_command(label = "Colossal (30 ft.)", command = set_token_size_colossal)
+token_size_menu.add_command(label = "WTF?", command = set_token_size_wtf)
 
 
-
-
-
-
+# Got sizes from some dnd website
+# Fine    1/2 ft.
+# Diminutive  1 ft.
+# Tiny    2-1/2 ft.
+# Small   5 ft. (made this 4 ft. just so it looks different on the screen)
+# Medium  5 ft.
+# Large   10 ft.
+# Huge    15 ft.
+# Gargantuan  20 ft.
+# Colossal    30 ft.
 
 
 #main popup menu
