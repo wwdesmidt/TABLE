@@ -248,8 +248,7 @@ menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
 menu.add_cascade(label="Map ...", menu=map_tools_menu)
 menu.add_cascade(label="Token ...", menu=token_tools_menu)
 menu.add_separator()
-#menu.add_command(label="Draw a test token", command = draw_token)
-menu.add_separator()
+
 menu.add_command(label="Exit", command=root.quit)
 
 map_tools_menu.add_command(label="Load Map", command=load_map)
