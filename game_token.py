@@ -2,18 +2,54 @@ import tkinter as tk
 from map import Map
 import uuid
 from PIL import Image, ImageTk, ImageDraw
+import json
+import pathlib
+import os
+
 
 class GameToken:
-    def __init__(self, file_name, canvas, map, x, y, radius, color):
+    def __init__(self, file_name, canvas, map, x, y):
 
         #generate a unique id for this token 
         #so we can find it and delete it when we move it
         self.id = uuid.uuid4()
 
-        print(f"hi, im a token, my name is {self.id}")
+        #print(f"hi, im a token, my name is {self.id}")
 
         #file name for the image, not used yet
         self.file_name = file_name
+
+        #get the absolute path for the token image
+        self.image_file = pathlib.Path(self.file_name)
+
+        #get the absolute path the json file (rules are same file name same directory)
+        self.json_file = pathlib.Path(self.image_file.parent,self.image_file.stem+".json")
+
+        #if the json file doesnt exist yet initialize it
+        if not os.path.isfile(self.json_file):
+            #initial json data
+            #this needs to contain whatever is read below
+            #default to white outline and medium size
+            initial_json_data = {
+                "image_file":self.image_file.name,
+                "radius":2.5,
+                "outline_color":"white"
+            }
+            with open(self.json_file, "w+") as f:
+                json.dump(initial_json_data,f)
+                print("didnt find a json file so made one")
+
+
+
+        #get the token image file name (dont know if we even need that
+        # and the radius and color in feet out of the json file
+        with open(self.json_file) as f:
+            data = json.load(f)
+            self.image_file_name = data["image_file"]
+            self.radius = data["radius"]
+            self.outline_color = data["outline_color"]
+
+
 
 
         #the canvas that we will draw the token on
@@ -23,7 +59,7 @@ class GameToken:
         self.map = map
 
         #radius, this will be read from a json file eventually
-        self.radius = radius
+        #self.radius = radius
         self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
 
         #where it is initially positioned... need to come up with something for this
@@ -31,8 +67,13 @@ class GameToken:
         self.y = y
 
         #outline color... also need to figure this out
-        self.outline_color = color
+        #self.outline_color = color
 
+        self.process_image()
+        
+
+
+    def process_image(self):
         #image processing stuff
         self.image = Image.open(self.file_name)
         #make the image square and the right size
@@ -45,7 +86,6 @@ class GameToken:
         self.image.putalpha(mask)
         #generate the photoimage to draw
         self.token = ImageTk.PhotoImage(self.image)
-
 
     #set the position of the token
     def set_position(self, x, y):
@@ -89,3 +129,48 @@ class GameToken:
         else:
             return False
 
+    #a method to set the color both on the screen and in the json file
+    def set_color(self, color):
+
+        #set the local color
+        self.outline_color = color
+
+        #open the current json file and pull out the data
+        with open(self.json_file, "r") as f:
+            json_data = json.load(f)
+
+        #update the color
+        json_data["outline_color"] = self.outline_color
+
+        #write the new values back to the file
+        with open(self.json_file, "w") as f:
+            json.dump(json_data,f)
+
+        #refresh the token on the screen
+        self.undraw()
+        self.draw()
+
+#a method to set the color both on the screen and in the json file
+    def set_redius(self, radius):
+
+        #set the local radius and recalculate pixels
+        self.radius = radius
+        self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
+
+        #open the current json file and pull out the data
+        with open(self.json_file, "r") as f:
+            json_data = json.load(f)
+
+        #update the radius
+        json_data["radius"] = self.radius
+
+        #write the new values back to the file
+        with open(self.json_file, "w") as f:
+            json.dump(json_data,f)
+
+        #re-resize the image
+        self.process_image()
+
+        #refresh the token on the screen
+        self.undraw()
+        self.draw()

@@ -37,7 +37,12 @@ map = None
 #a list of tokens
 tokens = set()
 moving_tokens = set()
+right_clicked_token = None
 
+
+#values for right click position
+right_click_x = 0
+right_click_y = 0
 
 
 #values for drawing
@@ -67,20 +72,135 @@ scale_end_y = 0
 
 
 
+
+
+#token popup menu
+def delete_token():
+    #get access to the tokens set
+    global tokens
+    global right_clicked_token
+
+    #get a set of tokens to delete (i think this should always be one?)
+    #tokens_to_delete = {token for token in tokens if token.contains(right_click_x,right_click_y)}
+
+    #undraw all the tokens (need this to get rid of colored borders)
+    #for token in tokens_to_delete:
+    #    token.undraw()
+
+    #remove the tokens to delete from the list of tokens
+    #tokens = tokens - tokens_to_delete
+
+
+    #so much easier now that i store the right clicked token!
+    right_clicked_token.undraw()
+    tokens.remove(right_clicked_token)
+    right_clicked_token = None
+
+
+#make this better eventually
+def set_token_color_red(): right_clicked_token.set_color("red")
+def set_token_color_orange(): right_clicked_token.set_color("orange")
+def set_token_color_yellow(): right_clicked_token.set_color("yellow")
+def set_token_color_green(): right_clicked_token.set_color("green")
+def set_token_color_blue(): right_clicked_token.set_color("blue")
+def set_token_color_indigo(): right_clicked_token.set_color("indigo")
+def set_token_color_violet(): right_clicked_token.set_color("violet")
+def set_token_color_black(): right_clicked_token.set_color("black")
+def set_token_color_white(): right_clicked_token.set_color("white")
+def set_token_color_grey(): right_clicked_token.set_color("grey")
+
+#radius so send half of size
+def set_token_size_fine(): right_clicked_token.set_redius(0.25)
+def set_token_size_diminutive(): right_clicked_token.set_redius(0.5)
+def set_token_size_tiny(): right_clicked_token.set_redius(1.25)
+def set_token_size_small(): right_clicked_token.set_redius(2)
+def set_token_size_medium(): right_clicked_token.set_redius(2.5)
+def set_token_size_large(): right_clicked_token.set_redius(5)
+def set_token_size_huge(): right_clicked_token.set_redius(7.5)
+def set_token_size_gargantuan(): right_clicked_token.set_redius(10)
+def set_token_size_colossal(): right_clicked_token.set_redius(15)
+def set_token_size_wtf(): right_clicked_token.set_redius(50)
+
+
+
+token_menu = tk.Menu(root, tearoff=0)
+token_size_menu = tk.Menu(token_menu, tearoff=0)
+token_color_menu = tk.Menu(token_menu, tearoff=0)
+
+
+
+token_menu.add_cascade(label = "Size ...", menu = token_size_menu)
+token_menu.add_cascade(label = "Color ...", menu = token_color_menu)
+token_menu.add_command(label = "Delete", command = delete_token)
+
+token_color_menu.add_command(label = "Red", command = set_token_color_red, foreground="red")
+token_color_menu.add_command(label = "Orange", command = set_token_color_orange, foreground="orange")
+token_color_menu.add_command(label = "Yellow", command = set_token_color_yellow, foreground="yellow")
+token_color_menu.add_command(label = "Green", command = set_token_color_green, foreground="green")
+token_color_menu.add_command(label = "Blue", command = set_token_color_blue, foreground="blue")
+token_color_menu.add_command(label = "Indigo", command = set_token_color_indigo, foreground="indigo")
+token_color_menu.add_command(label = "Violet", command = set_token_color_violet, foreground="violet")
+token_color_menu.add_command(label = "Black", command = set_token_color_black, foreground="black")
+token_color_menu.add_command(label = "White", command = set_token_color_white, foreground="white")
+token_color_menu.add_command(label = "Grey", command = set_token_color_grey, foreground="grey")
+
+token_size_menu.add_command(label = "Fine (1/2 ft.)", command = set_token_size_fine)
+token_size_menu.add_command(label = "Diminutive (1 ft.)", command = set_token_size_diminutive)
+token_size_menu.add_command(label = "Tiny (2-1/2 ft.)", command = set_token_size_tiny)
+token_size_menu.add_command(label = "Small (4 ft.)", command = set_token_size_small)
+token_size_menu.add_command(label = "Medium (5 ft.)", command = set_token_size_medium)
+token_size_menu.add_command(label = "Large (10 ft.)", command = set_token_size_large)
+token_size_menu.add_command(label = "Huge (15 ft.)", command = set_token_size_huge)
+token_size_menu.add_command(label = "Gargantuan (20 ft.)", command = set_token_size_gargantuan)
+token_size_menu.add_command(label = "Colossal (30 ft.)", command = set_token_size_colossal)
+token_size_menu.add_command(label = "WTF?", command = set_token_size_wtf)
+
+
+# Got sizes from some dnd website
+# Fine    1/2 ft.
+# Diminutive  1 ft.
+# Tiny    2-1/2 ft.
+# Small   5 ft. (made this 4 ft. just so it looks different on the screen)
+# Medium  5 ft.
+# Large   10 ft.
+# Huge    15 ft.
+# Gargantuan  20 ft.
+# Colossal    30 ft.
+
+
+#main popup menu
 def set_mode():
     global mode
     mode=mode_selection.get()
 
 def set_draw_color():
     global draw_color
-    draw_color=color_selection.get()
+    draw_color=draw_color_selection.get()
 
 
 def load_map():
+    #get access to the map locally
     global map
+    #file dialog to open a map image
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
+    #create map instance
     map = Map(file.name, table_top)
+    #draw the map
     map.draw_map()
+
+def add_token():
+    #file dialog to load token image
+    file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
+
+    #create a token where the right click was
+    #hard coded to 5 feet green for now
+    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,)) 
+
+    #redraw tokens  so the new one shows up
+    # (will this cause all the other tokens to be doubled until they move again? 
+    # maybe add a redraw function to token class that removes it first)
+    for token in tokens:
+        token.draw()
 
 def set_distance_scale():
     global distance_scale_feet
@@ -103,13 +223,10 @@ def clear_drawing():
     destroy_by_tag("drawn_line")
 
 
-# create a popup menu
-
-
-
 
 menu = tk.Menu(root, tearoff=0)
 map_tools_menu = tk.Menu(menu, tearoff=0)
+token_tools_menu = tk.Menu(menu, tearoff=0)
 draw_colors_menu = tk.Menu(menu, tearoff=0)
 
 
@@ -119,7 +236,7 @@ draw_colors_menu = tk.Menu(menu, tearoff=0)
 
 
 mode_selection = tk.StringVar()
-color_selection = tk.StringVar()
+draw_color_selection = tk.StringVar()
 
 menu.add_radiobutton(label="Move", variable=mode_selection, value="move", command=set_mode)
 menu.add_radiobutton(label="Draw", variable=mode_selection, value="draw", command=set_mode)
@@ -129,9 +246,9 @@ menu.add_command(label="Clear Drawing", command=clear_drawing)
 menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
 
 menu.add_cascade(label="Map ...", menu=map_tools_menu)
+menu.add_cascade(label="Token ...", menu=token_tools_menu)
 menu.add_separator()
-#menu.add_command(label="Draw a test token", command = draw_token)
-menu.add_separator()
+
 menu.add_command(label="Exit", command=root.quit)
 
 map_tools_menu.add_command(label="Load Map", command=load_map)
@@ -139,13 +256,35 @@ map_tools_menu.add_command(label="Load Map", command=load_map)
 #map_tools_menu.add_command(label="Sample Map: Large", command=load_large_map)
 map_tools_menu.add_command(label="Set Distance Scale", command=set_distance_scale)
 
-draw_colors_menu.add_radiobutton(label="black", variable=color_selection, value="black", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="red", variable=color_selection, value="red", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="green", variable=color_selection, value="green", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="blue", variable=color_selection, value="blue", command=set_draw_color)
+token_tools_menu.add_command(label="Add Token", command=add_token)
 
+draw_colors_menu.add_radiobutton(label="black", variable=draw_color_selection, value="black", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="red", variable=draw_color_selection, value="red", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="green", variable=draw_color_selection, value="green", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="blue", variable=draw_color_selection, value="blue", command=set_draw_color)
+
+#right click mouse event (maybe could use a better name?)
 def popup(event):
-    menu.post(event.x_root, event.y_root)
+    #store the right click position (maybe theres a better way to do this?)
+    global right_click_x
+    global right_click_y
+    right_click_x = event.x
+    right_click_y = event.y
+
+    token_clicked = False
+
+    for token in tokens:
+        if token.contains(event.x, event.y):
+            global right_clicked_token
+            right_clicked_token = token
+            token_clicked = True
+            break
+
+
+    if token_clicked == True:
+        token_menu.post(event.x_root, event.y_root)
+    else:
+        menu.post(event.x_root, event.y_root)
 
 #end menu section
 ###############################################################################################
@@ -336,22 +475,6 @@ root.bind_all("<ButtonRelease-3>", popup)
 map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
 map.draw_map()
 
-
-###################################temporary token section
-
-
-#test_token = GameToken("not_used_yet", table_top, map)
-
-
-tokens.add(GameToken("sample_assets/rogue.png", table_top, map,400,300,1.75,"green"))
-tokens.add(GameToken("sample_assets/sorcerer.png", table_top, map,400,400,2.5,"green"))
-tokens.add(GameToken("sample_assets/druid.png", table_top, map,400,500,2.5,"green"))
-tokens.add(GameToken("sample_assets/beholder.png", table_top, map,1200,800,15,"red"))
-
-for token in tokens:
-    token.draw()
-
-###################################temporary token section
 
 
 #draw_token()
