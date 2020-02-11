@@ -187,6 +187,10 @@ def load_map():
     map = Map(file.name, table_top)
     #draw the map
     map.draw_map()
+    #get rid of all tokens
+    for token in tokens:
+        token.undraw()
+    tokens.clear()
 
 def add_token():
     #file dialog to load token image

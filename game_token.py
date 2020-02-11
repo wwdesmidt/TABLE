@@ -60,7 +60,8 @@ class GameToken:
 
         #radius, this will be read from a json file eventually
         #self.radius = radius
-        self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
+        #self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
+        self.calculate_radius_pixels()
 
         #where it is initially positioned... need to come up with something for this
         self.x = x
@@ -91,6 +92,14 @@ class GameToken:
     def set_position(self, x, y):
         self.x=x
         self.y=y
+
+    #calculate 
+    def calculate_radius_pixels(self):
+        self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
+
+        #just have some minimum size
+        if self.radius_pixels < 3:
+            self.radius_pixels = 3
 
     def move(self, x, y):
         self.undraw()
@@ -155,7 +164,8 @@ class GameToken:
 
         #set the local radius and recalculate pixels
         self.radius = radius
-        self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
+        #self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
+        self.calculate_radius_pixels()
 
         #open the current json file and pull out the data
         with open(self.json_file, "r") as f:
