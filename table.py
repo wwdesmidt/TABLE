@@ -39,6 +39,10 @@ tokens = set()
 moving_tokens = set()
 
 
+#values for right click position
+right_click_x = 0
+right_click_y = 0
+
 
 #values for drawing
 draw_color="black"
@@ -82,6 +86,12 @@ def load_map():
     map = Map(file.name, table_top)
     map.draw_map()
 
+def add_token():
+    tokens.add(GameToken("sample_assets/rogue.png", table_top, map,right_click_x,right_click_y,1.75,"green")) 
+
+    for token in tokens:
+        token.draw()
+
 def set_distance_scale():
     global distance_scale_feet
     global mode
@@ -110,6 +120,7 @@ def clear_drawing():
 
 menu = tk.Menu(root, tearoff=0)
 map_tools_menu = tk.Menu(menu, tearoff=0)
+token_tools_menu = tk.Menu(menu, tearoff=0)
 draw_colors_menu = tk.Menu(menu, tearoff=0)
 
 
@@ -129,6 +140,7 @@ menu.add_command(label="Clear Drawing", command=clear_drawing)
 menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
 
 menu.add_cascade(label="Map ...", menu=map_tools_menu)
+menu.add_cascade(label="Token ...", menu=token_tools_menu)
 menu.add_separator()
 #menu.add_command(label="Draw a test token", command = draw_token)
 menu.add_separator()
@@ -139,12 +151,21 @@ map_tools_menu.add_command(label="Load Map", command=load_map)
 #map_tools_menu.add_command(label="Sample Map: Large", command=load_large_map)
 map_tools_menu.add_command(label="Set Distance Scale", command=set_distance_scale)
 
+token_tools_menu.add_command(label="Add Token", command=add_token)
+
 draw_colors_menu.add_radiobutton(label="black", variable=color_selection, value="black", command=set_draw_color)
 draw_colors_menu.add_radiobutton(label="red", variable=color_selection, value="red", command=set_draw_color)
 draw_colors_menu.add_radiobutton(label="green", variable=color_selection, value="green", command=set_draw_color)
 draw_colors_menu.add_radiobutton(label="blue", variable=color_selection, value="blue", command=set_draw_color)
 
+#right click mouse event (maybe could use a better name?)
 def popup(event):
+    #store the right click position (maybe theres a better way to do this?)
+    global right_click_x
+    global right_click_y
+    right_click_x = event.x
+    right_click_y = event.y
+
     menu.post(event.x_root, event.y_root)
 
 #end menu section
