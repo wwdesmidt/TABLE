@@ -49,6 +49,9 @@ right_click_y = 0
 draw_color="black"
 draw_width=3
 
+#values for erasing
+eraser_size=20
+
 #strarting position for dragging distance
 draging_distance_start_x = 0
 draging_distance_start_y = 0
@@ -244,6 +247,7 @@ draw_color_selection = tk.StringVar()
 
 menu.add_radiobutton(label="Move", variable=mode_selection, value="move", command=set_mode)
 menu.add_radiobutton(label="Draw", variable=mode_selection, value="draw", command=set_mode)
+menu.add_radiobutton(label="Erase", variable=mode_selection, value="erase", command=set_mode)
 
 menu.add_command(label="Clear Drawing", command=clear_drawing)
 
@@ -269,6 +273,11 @@ draw_colors_menu.add_radiobutton(label="blue", variable=draw_color_selection, va
 
 #right click mouse event (maybe could use a better name?)
 def popup(event):
+
+    #if there is an eraser box, delete it
+    #TODO create a dedicated right click handler that then calls popup so this doesnt have to be here
+    destroy_by_tag("eraser_bounds")
+
     #store the right click position (maybe theres a better way to do this?)
     global right_click_x
     global right_click_y
@@ -300,7 +309,11 @@ def popup(event):
 #Start input section
 ###############################################################################################
 
-
+def mouse_moved(event):
+    #if we are in erase mode draw the eraser bounds
+    if mode=="erase":
+        destroy_by_tag("eraser_bounds")
+        table_top.create_rectangle(event.x-(eraser_size/2), event.y-(eraser_size/2), event.x+(eraser_size/2),event.y+(eraser_size/2), tag="eraser_bounds")
 
 def left_mouse_button_press(event):
     if mode=="move":
@@ -346,6 +359,8 @@ def left_mouse_button_drag(event):
         left_mouse_button_drag_draw(event)
     elif mode=="scale":
         left_mouse_button_drag_scale(event)
+    elif mode=="erase":
+        left_mouse_button_drag_erase(event)
 
 def left_mouse_button_drag_move(event):
     #calculate the distance between the starting point and the current point
@@ -375,7 +390,6 @@ def left_mouse_button_drag_move(event):
         for token in moving_tokens:
             token.move(event.x, event.y)
 
-
 def left_mouse_button_drag_draw(event):
     #get global variables for where the mouse is moving from
     global drawing_start_x
@@ -395,6 +409,17 @@ def left_mouse_button_drag_scale(event):
     scale_end_y = event.y
     destroy_by_tag("scale_line")
     table_top.create_line(scale_start_x, scale_start_y, scale_end_x, scale_end_y, width=1, fill="black", tag="scale_line")
+
+def left_mouse_button_drag_erase(event):
+    destroy_by_tag("eraser_bounds")
+    table_top.create_rectangle(event.x-(eraser_size/2), event.y-(eraser_size/2), event.x+(eraser_size/2),event.y+(eraser_size/2), tag="eraser_bounds")
+    
+    for drawn_line_segment in table_top.find_withtag("drawn_line"):
+        if (table_top.coords(drawn_line_segment)[0]>event.x-(eraser_size/2) and 
+            table_top.coords(drawn_line_segment)[0]<event.x+(eraser_size/2) and 
+            table_top.coords(drawn_line_segment)[1]>event.y-(eraser_size/2) and 
+            table_top.coords(drawn_line_segment)[1]<event.y+(eraser_size/2)):
+            table_top.delete(drawn_line_segment)
 
 def left_mouse_button_release(event):
     if mode=="move":
@@ -467,6 +492,7 @@ def destroy_by_tag(tag):
 
 
 #set up all the key bindings
+root.bind_all("<Motion>", mouse_moved)
 root.bind_all("<ButtonPress-1>", left_mouse_button_press)
 root.bind_all("<B1-Motion>", left_mouse_button_drag)
 root.bind_all("<ButtonRelease-1>", left_mouse_button_release)
