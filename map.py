@@ -91,6 +91,9 @@ class Map():
         self.max_map_size = (self.map_new_width, self.map_new_height)
         self.map_image = self.map_image.resize(self.max_map_size)
 
+        #display the map upside down so it looks right to the players sitting across from the dm?
+        #self.map_image = self.map_image.rotate(180)
+
 
         #get the photoimage after transformations
         self.map = ImageTk.PhotoImage(self.map_image)
