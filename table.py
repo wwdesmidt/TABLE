@@ -34,6 +34,9 @@ mode = "move"
 #the current map object
 map = None
 
+#debug?
+debug = False
+
 #a list of tokens
 tokens = set()
 moving_tokens = set()
@@ -306,8 +309,30 @@ def popup(event):
 ###############################################################################################
 
 
+def print_debug():
+    tracked_items = table_top.find_all()
 
+    all_tags = set()
 
+    for item in tracked_items:
+        tags = table_top.gettags(item)
+        for tag in tags:
+            all_tags.add(tag)
+
+    print_offset = 1
+    print_spacing = 10
+    
+    destroy_by_tag("debug_text")
+
+    table_top.create_rectangle(0,0,400,500,fill="white", tag="debug_text")
+
+    for tag in all_tags:
+        
+        table_top.create_text(200, print_offset*print_spacing, text = f"{tag}: {len(table_top.find_withtag(tag))}", anchor="e", tag="debug_text")
+        print_offset+=1
+        print (f"{tag}: {len(table_top.find_withtag(tag))}")
+
+    
 
 #Start input section
 ###############################################################################################
@@ -317,6 +342,13 @@ def mouse_moved(event):
     if mode=="erase":
         destroy_by_tag("eraser_bounds")
         table_top.create_rectangle(event.x-(eraser_size/2), event.y-(eraser_size/2), event.x+(eraser_size/2),event.y+(eraser_size/2), tag="eraser_bounds")
+
+    if debug == True:
+        print_debug()
+
+        
+    
+
 
 def left_mouse_button_press(event):
     if mode=="move":
@@ -369,6 +401,10 @@ def left_mouse_button_drag(event):
         left_mouse_button_drag_erase(event)
 
 def left_mouse_button_drag_move(event):
+
+    if debug == True:
+        print_debug()
+
     #calculate the distance between the starting point and the current point
     dist = math.sqrt((event.x - draging_distance_start_x)**2 + (event.y - draging_distance_start_y)**2)
     #add in calculation for feet per pixel
@@ -386,12 +422,16 @@ def left_mouse_button_drag_move(event):
         distance_unit = "Miles"
         dist = round(dist,1)
  
-    #delete the old distance text and line and draw new ones
-    destroy_by_tag("dragging_distance_line")
+    #only draw this line if we are "measuring" and not moving
+    if token_moving == False:
+        #delete the old distance text and line and draw new ones
+        destroy_by_tag("dragging_distance_line")
+        table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, width=3, dash=(30,10), tag = "dragging_distance_line")
+        #table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_message", anchor="w")
+        #table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"{dist} {distance_unit}", tag="dragging_distance_message")
+
+    
     destroy_by_tag("dragging_distance_message")
-    table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, width=3, dash=(30,10), tag = "dragging_distance_line")
-    #table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_message", anchor="w")
-    #table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"{dist} {distance_unit}", tag="dragging_distance_message")
 
     #bottom, right side up
     table_top.create_rectangle(
@@ -474,9 +514,15 @@ def left_mouse_button_drag_move(event):
 
 
     if token_moving == True:
-        left_clicked_token.move(event.x, event.y)
-        #for token in moving_tokens:
-            #token.move(event.x, event.y)
+        destroy_by_tag("moving_outline")
+
+        x1 = event.x-left_clicked_token.radius_pixels
+        y1 = event.y-left_clicked_token.radius_pixels
+        x2 = event.x+left_clicked_token.radius_pixels
+        y2 = event.y+left_clicked_token.radius_pixels
+
+        table_top.create_line(left_clicked_token.x, left_clicked_token.y, event.x, event.y, width=3, dash=(30,10), tag="moving_outline")
+        table_top.create_oval(x1, y1, x2, y2, width=3, outline=left_clicked_token.outline_color, tag="moving_outline")
 
 def left_mouse_button_drag_draw(event):
     #get global variables for where the mouse is moving from
@@ -518,14 +564,28 @@ def left_mouse_button_release(event):
         left_mouse_button_release_scale(event)
 
 def left_mouse_button_release_move(event):
-    #the user let go of the left mouse button, delete the distance line and text
-    destroy_by_tag("dragging_distance_line")
-    destroy_by_tag("dragging_distance_message")
-
+    global left_clicked_token
     global token_moving
-    token_moving = False
 
-    moving_tokens.clear()
+    #the user let go of the left mouse button, delete the distance line and text
+
+    if token_moving == True:
+        destroy_by_tag("moving_outline")
+        destroy_by_tag("dragging_distance_message")
+        left_clicked_token.move(event.x, event.y)
+
+        
+        
+        token_moving = False
+        left_clicked_token = None
+
+        moving_tokens.clear()
+
+
+    else:
+        destroy_by_tag("dragging_distance_line")
+        destroy_by_tag("dragging_distance_message")
+
 
 def left_mouse_button_release_draw(event):
     #dont need to do anything right now when the user lets go of the mouse button while drawing
