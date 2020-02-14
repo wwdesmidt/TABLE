@@ -87,8 +87,22 @@ scale_end_y = 0
 
 #start menu section
 ###############################################################################################
+#area effect popup menu
+def delete_area_effect():
+    global area_effects
+    global right_clicked_area_effect
+    right_clicked_area_effect.undraw()
+    area_effects.remove(right_clicked_area_effect)
+    right_clicked_area_effect = None
 
+def rotate_area_effect():
+    global mode
+    mode = "rotating_area_effect"
 
+area_effect_menu = tk.Menu(root, tearoff=0)
+
+area_effect_menu.add_command(label="Rotate", command=rotate_area_effect)
+area_effect_menu.add_command(label="Delete", command=delete_area_effect)
 
 
 
@@ -341,9 +355,10 @@ def popup(event):
     if token_clicked == True:
         token_menu.post(event.x_root, event.y_root)
     elif area_effect_clicked == True:
-        #area_effect_menu.post(event.x_root, event.y_root)
-        global mode
-        mode = "rotating_area_effect"
+        area_effect_menu.post(event.x_root, event.y_root)
+        #global mode
+        #mode = "rotating_area_effect"
+
     else:
         menu.post(event.x_root, event.y_root)
 
