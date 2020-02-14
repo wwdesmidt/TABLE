@@ -37,7 +37,7 @@ mode = "move"
 map = None
 
 #debug?
-debug = False
+debug = True
 
 #a list of tokens
 tokens = set()
@@ -200,6 +200,10 @@ def load_map():
     for token in tokens:
         token.undraw()
     tokens.clear()
+
+    for area_effect in area_effects:
+        area_effect.undraw()
+    area_effects.clear()
 
 def add_token():
     #file dialog to load token image
@@ -364,11 +368,18 @@ def print_debug():
 
     table_top.create_rectangle(0,0,400,500,fill="white", tag="debug_text")
 
+    table_top.create_text(200, print_offset*print_spacing, text = f"mode: {mode}", anchor="e", tag="debug_text")
+    print_offset += 1
+    table_top.create_text(200, print_offset*print_spacing, text = f"moving token: {token_moving}", anchor="e", tag="debug_text")
+    print_offset += 1
+    table_top.create_text(200, print_offset*print_spacing, text = f"moving area effect: {area_effect_moving}", anchor="e", tag="debug_text")
+    print_offset += 1
+
     for tag in all_tags:
         
         table_top.create_text(200, print_offset*print_spacing, text = f"{tag}: {len(table_top.find_withtag(tag))}", anchor="e", tag="debug_text")
         print_offset+=1
-        print (f"{tag}: {len(table_top.find_withtag(tag))}")
+        #print (f"{tag}: {len(table_top.find_withtag(tag))}")
 
     
 
@@ -585,6 +596,7 @@ def left_mouse_button_drag_move(event):
 
         #redraw all tokens so they stay on top of the area effect
         for token in tokens:
+            token.undraw()
             token.draw()
 
     else:
@@ -627,6 +639,10 @@ def left_mouse_button_drag_erase(event):
             table_top.delete(drawn_line_segment)
 
 def left_mouse_button_release(event):
+
+    if debug==True:
+        print_debug()
+
     if mode=="move":
         left_mouse_button_release_move(event)
     elif mode=="draw":
@@ -656,10 +672,12 @@ def left_mouse_button_release_move(event):
 
         global left_clicked_area_effect
         
-        left_clicked_area_effect = None
-        area_effect_moving=False
-
         destroy_by_tag("dragging_distance_message")
+
+        area_effect_moving=False
+        left_clicked_area_effect = None
+
+        
 
     else:
         destroy_by_tag("dragging_distance_line")

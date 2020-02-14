@@ -31,9 +31,7 @@ class AreaEffect:
         self.width_pixels = round(self.width/self.map.map_feet_per_pixel)
 
 
-
     def draw(self):
-
 
         if self.shape=="circle" or self.shape=="oval":
             # x1 = self.x - self.radius_pixels
@@ -110,10 +108,10 @@ class AreaEffect:
     def contains(self, x,y):
 
         
-        x1 = self.x - self.radius_pixels
-        y1 = self.y - self.radius_pixels
-        x2 = self.x + self.radius_pixels
-        y2 = self.y + self.radius_pixels
+        x1 = self.x - self.width_pixels/2
+        y1 = self.y - self.height_pixels/2
+        x2 = self.x + self.width_pixels/2
+        y2 = self.y + self.height_pixels/2
 
         if x > x1 and x < x2 and y > y1 and y < y2:
             return True

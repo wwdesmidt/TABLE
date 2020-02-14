@@ -30,8 +30,6 @@ class AreaEffectBox:
         width_input.pack()
 
 
-
-
         #radio buttons to choose shape
         shape_label = tk.Label(top, text="Shape")
         self.shape_selection = tk.StringVar()
@@ -67,9 +65,6 @@ class AreaEffectBox:
 #     print(weekday.current())
 
 # weekday.bind("<<ComboboxSelected>>", handle_selection)
-
-
-
 
 
         color_label = tk.Label(top, text="Color")
