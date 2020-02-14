@@ -20,13 +20,13 @@ class AreaEffect:
         self.width = width
 
         #do something stupid so it doesnt break
-        self.radius = round((self.height+self.width)/2)
+        #self.radius = round((self.height+self.width)/2)
 
         self.color = color
         self.x = x
         self.y = y
         self.complex_angle=0.0
-        self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
+        #self.radius_pixels = round(self.radius/self.map.map_feet_per_pixel)
         self.height_pixels = round(self.height/self.map.map_feet_per_pixel)
         self.width_pixels = round(self.width/self.map.map_feet_per_pixel)
 
@@ -34,10 +34,6 @@ class AreaEffect:
     def draw(self):
 
         if self.shape=="Cylinder" or self.shape=="Sphere":
-            # x1 = self.x - self.radius_pixels
-            # y1 = self.y - self.radius_pixels
-            # x2 = self.x + self.radius_pixels
-            # y2 = self.y + self.radius_pixels
 
             x1 = self.x - self.width_pixels/2
             x2 = self.x + self.width_pixels/2
@@ -74,14 +70,42 @@ class AreaEffect:
                     new_points.append(v.imag)
                     new_points.append((v.real,v.imag))
 
-                self.canvas.create_polygon(new_points,outline=self.color, fill=self.color, width=3, tag=self.id )
+                self.canvas.create_polygon(new_points,outline=self.color, fill=self.color, width=3, tag=self.id)
         
         elif self.shape=="Cone":
             #basically make a triange
-            pass
+
+            # x1 = self.x
+            # y1 = self.y
+            # x2 = self.x-self.height_pixels/2
+            # y2 = self.y-self.height_pixels
+            # x3 = self.x+self.height_pixels/2
+            # y3 = self.y-self.height_pixels
+
+            x1 = self.x
+            y1 = self.y
+            x2 = self.x+self.height_pixels
+            y2 = self.y-self.height_pixels/2
+            x3 = self.x+self.height_pixels
+            y3 = self.y+self.height_pixels/2
+
+            self.points=[(x1,y1),(x2,y2),(x3,y3)]
+            
+            #self.canvas.create_polygon(self.points,outline=self.color, fill=self.color, width=3, tag=self.id)
 
 
+            if self.complex_angle == 0.0:
+                self.canvas.create_polygon(self.points,outline=self.color, fill=self.color, width=3, tag=self.id )
+            else:
+                offset = complex(self.x, self.y)
+                new_points = []
+                for x, y in self.points:
+                    v = self.complex_angle * (complex(x, y) - offset) + offset
+                    new_points.append(v.real)
+                    new_points.append(v.imag)
+                    new_points.append((v.real,v.imag))
 
+                self.canvas.create_polygon(new_points,outline=self.color, fill=self.color, width=3, tag=self.id)
     
 
     def rotate_by_mouse(self, mouse_x, mouse_y):
