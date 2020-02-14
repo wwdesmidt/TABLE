@@ -89,20 +89,11 @@ def delete_token():
     global tokens
     global right_clicked_token
 
-    #get a set of tokens to delete (i think this should always be one?)
-    #tokens_to_delete = {token for token in tokens if token.contains(right_click_x,right_click_y)}
-
-    #undraw all the tokens (need this to get rid of colored borders)
-    #for token in tokens_to_delete:
-    #    token.undraw()
-
-    #remove the tokens to delete from the list of tokens
-    #tokens = tokens - tokens_to_delete
-
-
-    #so much easier now that i store the right clicked token!
+    #undraw the token
     right_clicked_token.undraw()
+    #delete the token
     tokens.remove(right_clicked_token)
+    #forget about the token compeletely
     right_clicked_token = None
 
 
@@ -603,33 +594,6 @@ def left_mouse_button_release_scale(event):
     mode="move"
     
 
-
-# def right_mouse_button_press(event):
-#     #get the global variables for where we are starting and set them to where the left button was pressed
-#     global drawing_start_x
-#     global drawing_start_y
-#     drawing_start_x = event.x
-#     drawing_start_y = event.y
-
-# def right_mouse_button_drag(event):
-#     #get global variables for where the mouse is moving from
-#     global drawing_start_x
-#     global drawing_start_y
-    
-#     #draw a line from where the mouse was last time it moved until now
-#     table_top.create_line(drawing_start_x, drawing_start_y, event.x, event.y, tag="drawn_line")
-
-#     #set the starting position for next time with the ending position this time
-#     drawing_start_x = event.x
-#     drawing_start_y = event.y
-
-#     #for dragging also call the normal movement handler
-#     #mouse_move(event)
-
-
-def right_mouse_button_release(event):
-    #user right clicked, open menu
-    table_top.create_rectangle(event.x+20, event.y+20, event.x-20, event.y-20, tag="menu")
 
 #destroy every object with a certain tag
 def destroy_by_tag(tag):
