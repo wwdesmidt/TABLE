@@ -5,10 +5,11 @@ from PIL import Image, ImageTk, ImageDraw
 import json
 import pathlib
 import os
+from math import pow, sqrt
 
 
 class GameToken:
-    def __init__(self, file_name, canvas, map, x, y):
+    def __init__(self, file_name, canvas, map, x, y, flipped):
 
         #generate a unique id for this token 
         #so we can find it and delete it when we move it
@@ -70,6 +71,8 @@ class GameToken:
         #outline color... also need to figure this out
         #self.outline_color = color
 
+        self.flipped = flipped
+
         self.process_image()
         
 
@@ -82,7 +85,8 @@ class GameToken:
         self.image = self.image.resize(self.image_size)
 
         #display images upside down so they look right to the players sitting across from the dm?
-        #self.image = self.image.rotate(180)
+        if self.flipped == True:
+            self.image = self.image.rotate(180)
 
         #generate a new temporary image (black with a white circle) to use as an alpha mask
         mask = Image.new('L', self.image_size, 0)
@@ -132,12 +136,11 @@ class GameToken:
 
     #a method to determine if a set of x,y coords are "inside" the token
     def contains(self, x,y):
-        x1 = self.x - self.radius_pixels
-        y1 = self.y - self.radius_pixels
-        x2 = self.x + self.radius_pixels
-        y2 = self.y + self.radius_pixels
+        #using bounding circle to calculate collision instead of full shape
+        # calculate mouse distance from origin
+        dist = sqrt(pow((x-self.x),2)+pow((y-self.y),2))
 
-        if x > x1 and x < x2 and y > y1 and y < y2:
+        if dist <= self.radius_pixels:
             return True
         else:
             return False
@@ -164,7 +167,7 @@ class GameToken:
         self.draw()
 
 #a method to set the color both on the screen and in the json file
-    def set_redius(self, radius):
+    def set_radius(self, radius):
 
         #set the local radius and recalculate pixels
         self.radius = radius
