@@ -73,14 +73,6 @@ class AreaEffect:
                 self.canvas.create_polygon(new_points,outline=self.color, fill=self.color, width=3, tag=self.id)
         
         elif self.shape=="Cone":
-            #basically make a triange
-
-            # x1 = self.x
-            # y1 = self.y
-            # x2 = self.x-self.height_pixels/2
-            # y2 = self.y-self.height_pixels
-            # x3 = self.x+self.height_pixels/2
-            # y3 = self.y-self.height_pixels
 
             x1 = self.x
             y1 = self.y
@@ -91,7 +83,7 @@ class AreaEffect:
 
             self.points=[(x1,y1),(x2,y2),(x3,y3)]
             
-            #self.canvas.create_polygon(self.points,outline=self.color, fill=self.color, width=3, tag=self.id)
+
 
 
             if self.complex_angle == 0.0:
@@ -107,6 +99,16 @@ class AreaEffect:
 
                 self.canvas.create_polygon(new_points,outline=self.color, fill=self.color, width=3, tag=self.id)
     
+
+        #draw a origination point bounding box
+        #this is also used to move it around etc. (solves weird hit detection issues with rotated shapes)
+        #bounding box size in feet
+        self.bounding_box_size = 5
+        self.bounding_box_radius_pixels = (self.bounding_box_size/2)/self.map.map_feet_per_pixel
+
+        #
+        self.canvas.create_oval(self.x-4,self.y-4, self.x+4,self.y+4, outline="black", fill="black", tag=self.id)
+        self.canvas.create_oval(self.x-self.bounding_box_radius_pixels,self.y-self.bounding_box_radius_pixels, self.x+self.bounding_box_radius_pixels,self.y+self.bounding_box_radius_pixels, outline="black", fill="", tag=self.id)
 
     def rotate_by_mouse(self, mouse_x, mouse_y):
         self.undraw()
@@ -137,15 +139,24 @@ class AreaEffect:
     def contains(self, x,y):
 
         
-        x1 = self.x - self.width_pixels/2
-        y1 = self.y - self.height_pixels/2
-        x2 = self.x + self.width_pixels/2
-        y2 = self.y + self.height_pixels/2
+        # x1 = self.x - self.width_pixels/2
+        # y1 = self.y - self.height_pixels/2
+        # x2 = self.x + self.width_pixels/2
+        # y2 = self.y + self.height_pixels/2
 
-        if x > x1 and x < x2 and y > y1 and y < y2:
+        #using bounding circle to calculate collision instead of full shape
+        # calculate mouse distance from origin
+        dist = math.sqrt(math.pow((x-self.x),2)+math.pow((y-self.y),2))
+
+        if dist <= self.bounding_box_radius_pixels:
             return True
         else:
             return False
+
+        # if x > x1 and x < x2 and y > y1 and y < y2:
+        #     return True
+        # else:
+        #     return False
 
 
 '''
