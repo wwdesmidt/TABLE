@@ -37,7 +37,7 @@ mode = "move"
 map = None
 
 #debug?
-debug = True
+debug = False
 
 #table top orientation
 #this flips the map and the tokens so they are facing players that are sitting across from the dm
