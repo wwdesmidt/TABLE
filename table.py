@@ -44,6 +44,9 @@ right_clicked_token = None
 right_click_x = 0
 right_click_y = 0
 
+#values for moving 
+token_moving = False
+left_clicked_token = None
 
 #values for drawing
 draw_color="black"
@@ -266,10 +269,10 @@ map_tools_menu.add_command(label="Set Distance Scale", command=set_distance_scal
 
 token_tools_menu.add_command(label="Add Token", command=add_token)
 
-draw_colors_menu.add_radiobutton(label="black", variable=draw_color_selection, value="black", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="red", variable=draw_color_selection, value="red", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="green", variable=draw_color_selection, value="green", command=set_draw_color)
-draw_colors_menu.add_radiobutton(label="blue", variable=draw_color_selection, value="blue", command=set_draw_color)
+draw_colors_menu.add_radiobutton(label="black", variable=draw_color_selection, value="black", command=set_draw_color, foreground="black")
+draw_colors_menu.add_radiobutton(label="red", variable=draw_color_selection, value="red", command=set_draw_color, foreground="red")
+draw_colors_menu.add_radiobutton(label="green", variable=draw_color_selection, value="green", command=set_draw_color, foreground="green")
+draw_colors_menu.add_radiobutton(label="blue", variable=draw_color_selection, value="blue", command=set_draw_color, foreground="blue")
 
 #right click mouse event (maybe could use a better name?)
 def popup(event):
@@ -330,11 +333,14 @@ def left_mouse_button_press_move(event):
         draging_distance_start_x = event.x
         draging_distance_start_y = event.y
 
+        #only get 1 token and store it instead of having a bunch to move
         for token in tokens:
             if token.contains(event.x, event.y):
                 global token_moving
+                global left_clicked_token
                 token_moving = True
-                moving_tokens.add(token)
+                left_clicked_token = token
+                break
 
 
 def left_mouse_button_press_draw(event):
@@ -381,14 +387,96 @@ def left_mouse_button_drag_move(event):
         dist = round(dist,1)
  
     #delete the old distance text and line and draw new ones
-    table_top.delete(table_top.find_withtag("dragging_distance_line"))
-    table_top.delete(table_top.find_withtag("dragging_distance_text"))
-    table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, tag = "dragging_distance_line")
-    table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_text", anchor="w")
+    destroy_by_tag("dragging_distance_line")
+    destroy_by_tag("dragging_distance_message")
+    table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, width=3, dash=(30,10), tag = "dragging_distance_line")
+    #table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_message", anchor="w")
+    #table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"{dist} {distance_unit}", tag="dragging_distance_message")
+
+    #bottom, right side up
+    table_top.create_rectangle(
+        (table_top.winfo_width()/2)-100, 
+        table_top.winfo_height()-40, 
+        (table_top.winfo_width()/2)+100, 
+        table_top.winfo_height()-10, 
+        fill="white",
+        stipple="gray50",
+        tag="dragging_distance_message"
+        )
+
+    table_top.create_text(
+        table_top.winfo_width()/2, 
+        table_top.winfo_height()-25, 
+        text=f"{dist} {distance_unit}", 
+        font=("TkDefaultFont", 24), 
+        tag="dragging_distance_message"
+        )
+
+    #top, upside down
+    table_top.create_rectangle(
+        (table_top.winfo_width()/2)-100, 
+        40, 
+        (table_top.winfo_width()/2)+100, 
+        10, 
+        fill="white",
+        stipple="gray50",
+        tag="dragging_distance_message"
+        )
+
+    table_top.create_text(
+        table_top.winfo_width()/2, 
+        25, 
+        text=f"{dist} {distance_unit}", 
+        font=("TkDefaultFont", 24), 
+        tag="dragging_distance_message",
+        angle=180
+        )
+
+    #right side
+    table_top.create_rectangle(
+        table_top.winfo_width()-40, 
+        (table_top.winfo_height()/2)-100, 
+        table_top.winfo_width()-10, 
+        (table_top.winfo_height()/2)+100, 
+        fill="white",
+        stipple="gray50",
+        tag="dragging_distance_message"
+        )
+
+    table_top.create_text(
+        table_top.winfo_width()-25, 
+        table_top.winfo_height()/2, 
+        text=f"{dist} {distance_unit}", 
+        font=("TkDefaultFont", 24), 
+        tag="dragging_distance_message",
+        angle=90
+        )
+
+    #left side
+    table_top.create_rectangle(
+        40, 
+        (table_top.winfo_height()/2)-100, 
+        10, 
+        (table_top.winfo_height()/2)+100, 
+        fill="white",
+        stipple="gray50",
+        tag="dragging_distance_message"
+        )
+
+    table_top.create_text(
+        25, 
+        table_top.winfo_height()/2, 
+        text=f"{dist} {distance_unit}", 
+        font=("TkDefaultFont", 24), 
+        tag="dragging_distance_message",
+        angle=270
+        )
+
 
     if token_moving == True:
-        for token in moving_tokens:
-            token.move(event.x, event.y)
+        left_clicked_token.move(event.x, event.y)
+        #for token in moving_tokens:
+            #token.move(event.x, event.y)
 
 def left_mouse_button_drag_draw(event):
     #get global variables for where the mouse is moving from
@@ -431,8 +519,8 @@ def left_mouse_button_release(event):
 
 def left_mouse_button_release_move(event):
     #the user let go of the left mouse button, delete the distance line and text
-    table_top.delete(table_top.find_withtag("dragging_distance_line"))
-    table_top.delete(table_top.find_withtag("dragging_distance_text"))
+    destroy_by_tag("dragging_distance_line")
+    destroy_by_tag("dragging_distance_message")
 
     global token_moving
     token_moving = False
