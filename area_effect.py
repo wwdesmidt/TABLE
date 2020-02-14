@@ -3,6 +3,7 @@ from map import Map
 import uuid
 from PIL import Image, ImageTk
 import cmath, math
+from math import pow, sqrt
 
 class AreaEffect:
     def __init__(self, canvas, map, shape, height, width, color, x, y):
@@ -108,7 +109,7 @@ class AreaEffect:
 
         #
         self.canvas.create_oval(self.x-4,self.y-4, self.x+4,self.y+4, outline="black", fill="black", tag=self.id)
-        self.canvas.create_oval(self.x-self.bounding_box_radius_pixels,self.y-self.bounding_box_radius_pixels, self.x+self.bounding_box_radius_pixels,self.y+self.bounding_box_radius_pixels, outline="black", fill="", tag=self.id)
+        self.canvas.create_oval(self.x-self.bounding_box_radius_pixels,self.y-self.bounding_box_radius_pixels, self.x+self.bounding_box_radius_pixels,self.y+self.bounding_box_radius_pixels, outline="black", fill="", dash=(1,1), tag=self.id)
 
     def rotate_by_mouse(self, mouse_x, mouse_y):
         self.undraw()
@@ -138,25 +139,14 @@ class AreaEffect:
     #a method to determine if a set of x,y coords are "inside" the area effect
     def contains(self, x,y):
 
-        
-        # x1 = self.x - self.width_pixels/2
-        # y1 = self.y - self.height_pixels/2
-        # x2 = self.x + self.width_pixels/2
-        # y2 = self.y + self.height_pixels/2
-
         #using bounding circle to calculate collision instead of full shape
         # calculate mouse distance from origin
-        dist = math.sqrt(math.pow((x-self.x),2)+math.pow((y-self.y),2))
+        dist = sqrt(pow((x-self.x),2)+pow((y-self.y),2))
 
         if dist <= self.bounding_box_radius_pixels:
             return True
         else:
             return False
-
-        # if x > x1 and x < x2 and y > y1 and y < y2:
-        #     return True
-        # else:
-        #     return False
 
 
 '''
