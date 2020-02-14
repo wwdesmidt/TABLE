@@ -4,7 +4,7 @@ import pathlib
 import os
 
 class Map():
-    def __init__(self, file_name, canvas):
+    def __init__(self, file_name, canvas, flipped):
 
         #store the canvas that we will br drawing the map to locally
         #as long as we never reassign it (self.canvas=whatever)
@@ -91,8 +91,12 @@ class Map():
         self.max_map_size = (self.map_new_width, self.map_new_height)
         self.map_image = self.map_image.resize(self.max_map_size)
 
+        #should we flip the map? used for table top vs vertical orientation
+        self.flipped = flipped
+
         #display the map upside down so it looks right to the players sitting across from the dm?
-        #self.map_image = self.map_image.rotate(180)
+        if self.flipped==True:
+            self.map_image = self.map_image.rotate(180)
 
 
         #get the photoimage after transformations
@@ -104,6 +108,8 @@ class Map():
         #needs to be stored as one of the file dimensions instad of just 
         #having feet_per_pixel in the json file because of different screen resolutions
         self.map_feet_per_pixel = self.map_width_feet / self.map_image.width
+
+        
 
 
     #simple method to just draw the map

@@ -39,6 +39,12 @@ map = None
 #debug?
 debug = True
 
+#table top orientation
+#this flips the map and the tokens so they are facing players that are sitting across from the dm
+#it also displays message on all 4 sides of the screen facing outward, instead of just one at the bottom
+#false would be used for playing on a vertical tv or monitor or osmething
+table_top_orientation = False
+
 #a list of tokens
 tokens = set()
 moving_tokens = set()
@@ -207,7 +213,7 @@ def load_map():
     #file dialog to open a map image
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
     #create map instance
-    map = Map(file.name, table_top)
+    map = Map(file.name, table_top, table_top_orientation)
     #draw the map
     map.draw_map()
     #get rid of all tokens
@@ -224,7 +230,7 @@ def add_token():
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
 
     #create a token where the right click was
-    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,)) 
+    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,table_top_orientation)) 
 
     #redraw tokens  so the new one shows up
     # (will this cause all the other tokens to be doubled until they move again? 
@@ -533,65 +539,66 @@ def left_mouse_button_drag_move(event):
         tag="dragging_distance_message"
         )
 
-    #top, upside down
-    table_top.create_rectangle(
-        (table_top.winfo_width()/2)-100, 
-        40, 
-        (table_top.winfo_width()/2)+100, 
-        10, 
-        fill="white",
-        stipple="gray50",
-        tag="dragging_distance_message"
-        )
+    if table_top_orientation==True:
+        #top, upside down
+        table_top.create_rectangle(
+            (table_top.winfo_width()/2)-100, 
+            40, 
+            (table_top.winfo_width()/2)+100, 
+            10, 
+            fill="white",
+            stipple="gray50",
+            tag="dragging_distance_message"
+            )
 
-    table_top.create_text(
-        table_top.winfo_width()/2, 
-        25, 
-        text=f"{dist} {distance_unit}", 
-        font=("TkDefaultFont", 24), 
-        tag="dragging_distance_message",
-        angle=180
-        )
+        table_top.create_text(
+            table_top.winfo_width()/2, 
+            25, 
+            text=f"{dist} {distance_unit}", 
+            font=("TkDefaultFont", 24), 
+            tag="dragging_distance_message",
+            angle=180
+            )
 
-    #right side
-    table_top.create_rectangle(
-        table_top.winfo_width()-40, 
-        (table_top.winfo_height()/2)-100, 
-        table_top.winfo_width()-10, 
-        (table_top.winfo_height()/2)+100, 
-        fill="white",
-        stipple="gray50",
-        tag="dragging_distance_message"
-        )
+        #right side
+        table_top.create_rectangle(
+            table_top.winfo_width()-40, 
+            (table_top.winfo_height()/2)-100, 
+            table_top.winfo_width()-10, 
+            (table_top.winfo_height()/2)+100, 
+            fill="white",
+            stipple="gray50",
+            tag="dragging_distance_message"
+            )
 
-    table_top.create_text(
-        table_top.winfo_width()-25, 
-        table_top.winfo_height()/2, 
-        text=f"{dist} {distance_unit}", 
-        font=("TkDefaultFont", 24), 
-        tag="dragging_distance_message",
-        angle=90
-        )
+        table_top.create_text(
+            table_top.winfo_width()-25, 
+            table_top.winfo_height()/2, 
+            text=f"{dist} {distance_unit}", 
+            font=("TkDefaultFont", 24), 
+            tag="dragging_distance_message",
+            angle=90
+            )
 
-    #left side
-    table_top.create_rectangle(
-        40, 
-        (table_top.winfo_height()/2)-100, 
-        10, 
-        (table_top.winfo_height()/2)+100, 
-        fill="white",
-        stipple="gray50",
-        tag="dragging_distance_message"
-        )
+        #left side
+        table_top.create_rectangle(
+            40, 
+            (table_top.winfo_height()/2)-100, 
+            10, 
+            (table_top.winfo_height()/2)+100, 
+            fill="white",
+            stipple="gray50",
+            tag="dragging_distance_message"
+            )
 
-    table_top.create_text(
-        25, 
-        table_top.winfo_height()/2, 
-        text=f"{dist} {distance_unit}", 
-        font=("TkDefaultFont", 24), 
-        tag="dragging_distance_message",
-        angle=270
-        )
+        table_top.create_text(
+            25, 
+            table_top.winfo_height()/2, 
+            text=f"{dist} {distance_unit}", 
+            font=("TkDefaultFont", 24), 
+            tag="dragging_distance_message",
+            angle=270
+            )
 
 
     if token_moving == True:
@@ -735,7 +742,7 @@ root.bind_all("<ButtonRelease-3>", popup)
 ###############################################################################################
 
 #load title screen
-map = Map("./sample_assets/sample_dungeon_map.jpg", table_top)
+map = Map("./sample_assets/sample_dungeon_map.jpg", table_top, table_top_orientation)
 map.draw_map()
 
 
