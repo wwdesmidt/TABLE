@@ -11,35 +11,94 @@ class AreaEffectBox:
         self.symmetrical = False
         self.radius = False
 
-        #spinbox to get the number part
-        height_label = tk.Label(top, text="Height")
+        main_container = ttk.Frame(top)
+        main_container.grid(sticky="nsew")
+
+        #label and combo box for presets
+        preset_label = tk.Label(main_container, text="Preset")
+        self.preset_selection = tk.StringVar()
+        preset_combobox = ttk.Combobox(main_container, textvariable=self.preset_selection)
+        preset_combobox["values"] = ("","Fireball","Thunderwave","Lightning Bolt", "Cone of Cold")
+        preset_label.grid(row=0, column=0, pady=5, padx=5, sticky="W")
+        preset_combobox.grid(row=0, column=1, pady=5, padx=5)
+
+        #load the preset info 
+        # i wanna load these from a file eventually
+        def handle_preset_selected(event):
+            if self.preset_selection.get()=="Fireball":
+                #set the shape selection and then invoke the shape handler
+                #to set all the stuff that sets, tricky!
+                self.shape_selection.set("Sphere")
+                handle_shape_selection(event)
+                self.height_selection.set(20)
+                self.width_selection.set(20)
+                self.color_selection.set("Red")
+
+            if self.preset_selection.get()=="Thunderwave":
+                self.shape_selection.set("Cube")
+                handle_shape_selection(event)
+                self.height_selection.set(15)
+                self.width_selection.set(15)
+                self.color_selection.set("Indigo")
+
+            if self.preset_selection.get()=="Lightning Bolt":
+                self.shape_selection.set("Line")
+                handle_shape_selection(event)
+                self.height_selection.set(5)
+                self.width_selection.set(100)
+                self.color_selection.set("Yellow")
+
+            if self.preset_selection.get()=="Cone of Cold":
+                self.shape_selection.set("Cone")
+                handle_shape_selection(event)
+                self.height_selection.set(60)
+                self.width_selection.set(60)
+                self.color_selection.set("Blue")
+
+            #if they pick the blank one again, dont need to do anything
+            else:
+                pass
+
+        #when they pick a preset call the preset event handler
+        preset_combobox.bind("<<ComboboxSelected>>", handle_preset_selected)
+
+        #spinbox to get the heignt
+        height_label = tk.Label(main_container, text="Height")
         self.height_selection = tk.IntVar(value=5)
-        height_input = tk.Spinbox(top, from_=1, to=100, textvariable=self.height_selection)
-        height_label.pack()
-        height_input.pack()
+        height_input = tk.Spinbox(main_container, from_=1, to=100, textvariable=self.height_selection)
+        height_label.grid(row=1, column=0, pady=5, padx=5, sticky="W")
+        height_input.grid(row=1, column=1, pady=5, padx=5)
 
 
 
-        #spinbox to get the number part
-        width_label = tk.Label(top, text="Width")
+        #spinbox to get the width
+        width_label = tk.Label(main_container, text="Width")
         self.width_selection = tk.IntVar(value=5)
-        width_input = tk.Spinbox(top, from_=1, to=100, textvariable=self.width_selection)
-        width_label.pack()
-        width_input.pack()
+        width_input = tk.Spinbox(main_container, from_=1, to=100, textvariable=self.width_selection)
+        width_label.grid(row=2, column=0, pady=5, padx=5, sticky="W")
+        width_input.grid(row=2, column=1, pady=5, padx=5)
+
+        
 
 
-        #radio buttons to choose shape
-        shape_label = tk.Label(top, text="Shape")
+        #combo box for shape
+        shape_label = tk.Label(main_container, text="Shape")
         self.shape_selection = tk.StringVar()
-        shape_combobox = ttk.Combobox(top, textvariable=self.shape_selection)
+        shape_combobox = ttk.Combobox(main_container, textvariable=self.shape_selection)
         shape_combobox["values"] = ("Cone","Cube","Cylinder","Line","Sphere")
-        shape_label.pack()
-        shape_combobox.pack()
+        shape_label.grid(row=3, column=0, pady=5, padx=5, sticky="W")
+        shape_combobox.grid(row=3, column=1, pady=5, padx=5)
+
+        #set default shape values
+        #can i call the event handler and just pass null as the event or something?
         self.shape_selection.set("Cube")
         self.symmetrical=True
+        self.radius=False
         width_input.configure(state="disabled")
+        height_label.configure(text="Size")
+        width_label.configure(text="")
 
-
+        #do various things with the fields depending on what shape the selected
         def handle_shape_selection(event):
             if self.shape_selection.get() == "Cone":
                 self.symmetrical=True
@@ -76,60 +135,52 @@ class AreaEffectBox:
                 height_label.configure(text="Radius")
                 width_label.configure(text="")
                 
-
+        #when the pick a shape, call the shape event handler to mess witht he fields
         shape_combobox.bind("<<ComboboxSelected>>", handle_shape_selection)
 
 
-        #option_feet = tk.Radiobutton(top, text="Circle", variable=self.shape_selection, value="circle")
-        #option_miles = tk.Radiobutton(top, text="Square", variable=self.shape_selection, value="square")
-        #option_feet.pack()
-        #option_miles.pack()
-    
 
-
-# def handle_selection(event):
-#     print(f"today is {selected_weekday.get()}")
-#     print(weekday.current())
-
-# weekday.bind("<<ComboboxSelected>>", handle_selection)
-
-
-        # preset_label = tk.Label(top, text="Presets")
-        # self.preset_selection = tk.StringVar()
-        # preset_combobox = ttx.Combobox(top, textvariable=self.preset_selection)
-        # preset_combobox["values"] = ("fireball")
-
-
-        color_label = tk.Label(top, text="Color")
+        #combo box for picking color
+        color_label = tk.Label(main_container, text="Color")
         self.color_selection = tk.StringVar()
-        color_combobox = ttk.Combobox(top, textvariable=self.color_selection)
-        color_combobox["values"] = ("red","orange","yellow","green","blue","indigo","violet","black","white","grey")
-        color_label.pack()
-        color_combobox.pack()
+        color_combobox = ttk.Combobox(main_container, textvariable=self.color_selection)
+        color_combobox["values"] = ("Red","Orange","Yellow","Green","Blue","Indigo","Violet","Black","White","Grey")
+        color_label.grid(row=4, column=0, pady=5, padx=5, sticky="W")
+        color_combobox.grid(row=4, column=1, pady=5, padx=5)
         self.color_selection.set("red")
 
-
-        #ok button
-        ok_button = tk.Button(top, text="OK", command=self.ok)
-        ok_button.pack()
+        #container so the buttons can have different columns than the rest of the fields
+        button_container = ttk.Frame(main_container)
+        button_container.grid(row=5, column=0, columnspan=2, sticky="NSWE")
 
         #cancel button
-        cancel_button = tk.Button(top, text="Cancel", command=self.cancel)
-        cancel_button.pack()
+        cancel_button = tk.Button(button_container, text="Cancel", command=self.cancel, width="15")
+        cancel_button.grid(row=0, column=0, pady=5, padx=(5,2.5))
+        
+        #ok button
+        ok_button = tk.Button(button_container, text="OK", command=self.ok, width="15")
+        ok_button.grid(row=0, column=1, pady=5, padx=(2.5,5))
+
+        
 
 
-
+    #if they clicked cancel return null
     def cancel(self):
-        #if they clicked cancel return null
+        #this is how the calling progam can tell they clicked cancel
         self._return = False
         self.top.destroy()
 
+    #if they clicked ok set all the values
     def ok(self):
+        #this is how the calling program can tell they clicked ok
         self._return = True
+        
+        #set shape and height
         self.shape = self.shape_selection.get()
         self.height = self.height_selection.get()
 
-        #if the object is symmetrical return the height as the width
+        #if the object is symmetrical return the height as the width too
+        #otherwise set he width 
         if self.symmetrical==True:
             self.width = self.height_selection.get()
         else:
@@ -140,9 +191,11 @@ class AreaEffectBox:
             self.width=self.width*2
             self.height=self.height*2
 
+        #set the color
         self.color = self.color_selection.get()
 
         self.top.destroy()
+
 
 
 '''
