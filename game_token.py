@@ -81,7 +81,8 @@ class GameToken:
         self.image_size = (self.radius_pixels*2, self.radius_pixels*2)
         self.image = self.image.resize(self.image_size)
 
-        self.image = self.image.rotate(180)
+        #display images upside down so they look right to the players sitting across from the dm?
+        #self.image = self.image.rotate(180)
 
         #generate a new temporary image (black with a white circle) to use as an alpha mask
         mask = Image.new('L', self.image_size, 0)
