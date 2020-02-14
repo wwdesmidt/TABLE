@@ -6,7 +6,9 @@ from PIL import Image, ImageTk
 from map import Map
 import json
 from measure_box import MeasureBox
+from area_effect_box import AreaEffectBox
 from game_token import GameToken
+from area_effect import AreaEffect
 
 #try to set windows dpi awareness
 #if it doesnt work (like if you arent on windows) just do nothing
@@ -42,6 +44,13 @@ tokens = set()
 moving_tokens = set()
 right_clicked_token = None
 
+#area effect variables
+area_effects = set()
+left_clicked_area_effect = None
+right_clicked_area_effect = None
+area_effect_moving = False
+left_clicked_area_effect_offset_x = 0
+left_clicked_area_effect_offset_y = 0
 
 #values for right click position
 right_click_x = 0
@@ -197,7 +206,6 @@ def add_token():
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
 
     #create a token where the right click was
-    #hard coded to 5 feet green for now
     tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,)) 
 
     #redraw tokens  so the new one shows up
@@ -222,6 +230,26 @@ def set_distance_scale():
         mode = "scale"
         #print instructions (if they picked miles this is gonna be messed up)
         table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"Draw a line that is {distance_scale_feet} feet long", tag="scale_text", anchor="center")
+
+
+def create_area_effect():
+    #put up the area effect creation box
+    area_effect_box = AreaEffectBox(root)
+    root.wait_window(area_effect_box.top)
+
+    #if the user didnt click cancel create the new area effect
+    if area_effect_box._return==True:
+        area_effects.add(AreaEffect(table_top, map, area_effect_box.shape,area_effect_box.height, area_effect_box.width,area_effect_box.color,right_click_x,right_click_y))
+
+        #redraw all area effects
+        for area_effect in area_effects:
+            area_effect.draw()
+
+        #redraw all tokens
+        #so area effects dont cover them
+        for token in tokens:
+            token.draw()
+
 
 def clear_drawing():
     destroy_by_tag("drawn_line")
@@ -254,12 +282,16 @@ menu.add_cascade(label="Map ...", menu=map_tools_menu)
 menu.add_cascade(label="Token ...", menu=token_tools_menu)
 menu.add_separator()
 
+menu.add_command(label="Create Area Effect", command=create_area_effect)
+
 menu.add_command(label="Exit", command=root.quit)
 
 map_tools_menu.add_command(label="Load Map", command=load_map)
 #map_tools_menu.add_command(label="Sample Map: Small", command=load_small_map)
 #map_tools_menu.add_command(label="Sample Map: Large", command=load_large_map)
 map_tools_menu.add_command(label="Set Distance Scale", command=set_distance_scale)
+
+
 
 token_tools_menu.add_command(label="Add Token", command=add_token)
 
@@ -290,9 +322,24 @@ def popup(event):
             token_clicked = True
             break
 
+    area_effect_clicked = False
+
+    if token_clicked == False:
+        for area_effect in area_effects:
+            if area_effect.contains(event.x, event.y):
+                global right_clicked_area_effect
+                right_clicked_area_effect = area_effect
+                area_effect_clicked = True
+                break
+
+
 
     if token_clicked == True:
         token_menu.post(event.x_root, event.y_root)
+    elif area_effect_clicked == True:
+        #area_effect_menu.post(event.x_root, event.y_root)
+        global mode
+        mode = "rotating_area_effect"
     else:
         menu.post(event.x_root, event.y_root)
 
@@ -334,6 +381,9 @@ def mouse_moved(event):
         destroy_by_tag("eraser_bounds")
         table_top.create_rectangle(event.x-(eraser_size/2), event.y-(eraser_size/2), event.x+(eraser_size/2),event.y+(eraser_size/2), tag="eraser_bounds")
 
+    if mode=="rotating_area_effect":
+        right_clicked_area_effect.rotate_by_mouse(event.x,event.y)
+
     if debug == True:
         print_debug()
 
@@ -348,6 +398,8 @@ def left_mouse_button_press(event):
         left_mouse_button_press_draw(event)
     elif mode=="scale":
         left_mouse_button_press_scale(event)
+    elif mode=="rotating_area_effect":
+        left_mouse_button_press_rotating_area_effect(event)
 
 def left_mouse_button_press_move(event):
         #get the global variables for where we are starting and set them to where the left button was pressed
@@ -365,6 +417,20 @@ def left_mouse_button_press_move(event):
                 left_clicked_token = token
                 break
 
+        #only try to move an area effect if you arent moving a token
+        #tokens take precedence
+        if token_moving == False:
+            for area_effect in area_effects:
+                if area_effect.contains(event.x, event.y):
+                    global area_effect_moving
+                    global left_clicked_area_effect
+                    global left_clicked_area_effect_offset_x
+                    global left_clicked_area_effect_offset_y
+                    left_clicked_area_effect_offset_x = event.x - area_effect.x
+                    left_clicked_area_effect_offset_y = event.y - area_effect.y
+                    area_effect_moving = True
+                    left_clicked_area_effect = area_effect
+                    break
 
 def left_mouse_button_press_draw(event):
     #get the global variables for where we are starting and set them to where the left button was pressed
@@ -379,7 +445,11 @@ def left_mouse_button_press_scale(event):
     scale_start_x = event.x
     scale_start_y = event.y
 
-
+def left_mouse_button_press_rotating_area_effect(event):
+    global mode
+    global right_clicked_area_effect
+    mode = "move"
+    right_clicked_area_effect = None
 
 def left_mouse_button_drag(event):
     if mode=="move":
@@ -413,13 +483,7 @@ def left_mouse_button_drag_move(event):
         distance_unit = "Miles"
         dist = round(dist,1)
  
-    #only draw this line if we are "measuring" and not moving
-    if token_moving == False:
-        #delete the old distance text and line and draw new ones
-        destroy_by_tag("dragging_distance_line")
-        table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, width=3, dash=(30,10), tag = "dragging_distance_line")
-        #table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_message", anchor="w")
-        #table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"{dist} {distance_unit}", tag="dragging_distance_message")
+
 
     
     destroy_by_tag("dragging_distance_message")
@@ -515,6 +579,22 @@ def left_mouse_button_drag_move(event):
         table_top.create_line(left_clicked_token.x, left_clicked_token.y, event.x, event.y, width=3, dash=(30,10), tag="moving_outline")
         table_top.create_oval(x1, y1, x2, y2, width=3, outline=left_clicked_token.outline_color, tag="moving_outline")
 
+    elif area_effect_moving == True:
+
+        left_clicked_area_effect.move(event.x-left_clicked_area_effect_offset_x, event.y-left_clicked_area_effect_offset_y)
+
+        #redraw all tokens so they stay on top of the area effect
+        for token in tokens:
+            token.draw()
+
+    else:
+        #only draw this line if we are "measuring" and not moving
+        #delete the old distance text and line and draw new ones
+        destroy_by_tag("dragging_distance_line")
+        table_top.create_line(draging_distance_start_x, draging_distance_start_y, event.x, event.y, width=3, dash=(30,10), tag = "dragging_distance_line")
+        #table_top.create_text(event.x+15, event.y, text=f"{dist} {distance_unit}", tag="dragging_distance_message", anchor="w")
+        #table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"{dist} {distance_unit}", tag="dragging_distance_message")
+
 def left_mouse_button_drag_draw(event):
     #get global variables for where the mouse is moving from
     global drawing_start_x
@@ -555,12 +635,13 @@ def left_mouse_button_release(event):
         left_mouse_button_release_scale(event)
 
 def left_mouse_button_release_move(event):
-    global left_clicked_token
     global token_moving
-
+    global area_effect_moving
     #the user let go of the left mouse button, delete the distance line and text
 
     if token_moving == True:
+        global left_clicked_token
+        
         destroy_by_tag("moving_outline")
         destroy_by_tag("dragging_distance_message")
         left_clicked_token.move(event.x, event.y)
@@ -571,7 +652,14 @@ def left_mouse_button_release_move(event):
         left_clicked_token = None
 
         moving_tokens.clear()
+    elif area_effect_moving == True:
 
+        global left_clicked_area_effect
+        
+        left_clicked_area_effect = None
+        area_effect_moving=False
+
+        destroy_by_tag("dragging_distance_message")
 
     else:
         destroy_by_tag("dragging_distance_line")
