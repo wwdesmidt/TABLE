@@ -25,10 +25,12 @@ class Map():
         if not os.path.isfile(self.json_file):
             #initial json data
             #this needs to contain whatever is read below
+            #defaulting size to 100 feet so tokens dont take up the whole screen
+            #if someone puts one down before setting the map scale
             initial_json_data = {
                 "image_file":self.image_file.name,
-                "width_feet":1,
-                "height_feet":1
+                "width_feet":100,
+                "height_feet":100
             }
             with open(self.json_file, "w+") as f:
                 json.dump(initial_json_data,f)

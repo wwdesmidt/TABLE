@@ -12,7 +12,7 @@ class AreaEffectBox:
         self.radius = False
 
         main_container = ttk.Frame(top)
-        main_container.grid(sticky="nsew")
+        main_container.grid(sticky="NSWE")
 
         #label and combo box for presets
         preset_label = tk.Label(main_container, text="Preset")

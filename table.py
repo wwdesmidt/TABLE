@@ -304,9 +304,11 @@ menu.add_cascade(label="Draw Colors", menu=draw_colors_menu)
 
 menu.add_cascade(label="Map ...", menu=map_tools_menu)
 menu.add_cascade(label="Token ...", menu=token_tools_menu)
-menu.add_separator()
+
 
 menu.add_command(label="Create Area Effect", command=create_area_effect)
+
+menu.add_separator()
 
 menu.add_command(label="Exit", command=root.quit)
 
