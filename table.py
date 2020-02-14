@@ -253,7 +253,28 @@ def set_distance_scale():
         #set the mode
         mode = "scale"
         #print instructions (if they picked miles this is gonna be messed up)
-        table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"Draw a line that is {distance_scale_feet} feet long", tag="scale_text", anchor="center")
+        #table_top.create_text(table_top.winfo_width()/2, table_top.winfo_height()/2, text=f"Draw a line that is {distance_scale_feet} feet long", tag="scale_text", anchor="center")
+
+        #put a message on the bottom of the screen.
+        #i really want to come up with an on screen message system to manage this stuff
+        #bottom, right side up
+        table_top.create_rectangle(
+            (table_top.winfo_width()/2)-225, 
+            table_top.winfo_height()-40, 
+            (table_top.winfo_width()/2)+225, 
+            table_top.winfo_height()-10, 
+            fill="white",
+            stipple="gray50",
+            tag="scale_text"
+            )
+
+        table_top.create_text(
+            table_top.winfo_width()/2, 
+            table_top.winfo_height()-25, 
+            text=f"Draw a line that is {distance_scale_feet} feet long", 
+            font=("TkDefaultFont", 24), 
+            tag="scale_text"
+            )
 
 
 def create_area_effect():
@@ -649,7 +670,8 @@ def left_mouse_button_drag_scale(event):
     scale_end_x = event.x
     scale_end_y = event.y
     destroy_by_tag("scale_line")
-    table_top.create_line(scale_start_x, scale_start_y, scale_end_x, scale_end_y, width=1, fill="black", tag="scale_line")
+    table_top.create_line(scale_start_x, scale_start_y, scale_end_x, scale_end_y, width=3, dash=(30,10), tag="scale_line")
+
 
 def left_mouse_button_drag_erase(event):
     destroy_by_tag("eraser_bounds")
