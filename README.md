@@ -1,3 +1,7 @@
+## 2/20/2020
+
+I added a graphical way to change settings, and a way to add more settings easily. Right now there is jsut "debug" and "table_top_orientation". It is actually a whole seperare project that I have been working on for the past few days, so once I got back to this project all I had to do was copy a file and write a few lines. https://github.com/wwdesmidt/python_settings_manager
+
 ## 2/14/2020 - Changes to movement system, area effects
 
 This was actually a pretty big change
