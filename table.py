@@ -9,6 +9,8 @@ from measure_box import MeasureBox
 from area_effect_box import AreaEffectBox
 from game_token import GameToken
 from area_effect import AreaEffect
+from settings_manager import SettingsManager, SettingsManagerFrame
+import settings_init
 
 #try to set windows dpi awareness
 #if it doesnt work (like if you arent on windows) just do nothing
@@ -17,6 +19,12 @@ try:
     windll.shcore.SetProcessDpiAwareness(1)
 except:
     pass
+
+
+
+#initialize settings
+#returns an instance of settings manager
+settings = settings_init.initialize_settings()
 
 #full screen root window
 root = tk.Tk()
@@ -37,13 +45,13 @@ mode = "move"
 map = None
 
 #debug?
-debug = False
+#debug = False
 
 #table top orientation
 #this flips the map and the tokens so they are facing players that are sitting across from the dm
 #it also displays message on all 4 sides of the screen facing outward, instead of just one at the bottom
 #false would be used for playing on a vertical tv or monitor or osmething
-table_top_orientation = False
+#table_top_orientation = False
 
 #a list of tokens
 tokens = set()
@@ -213,7 +221,7 @@ def load_map():
     #file dialog to open a map image
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
     #create map instance
-    map = Map(file.name, table_top, table_top_orientation)
+    map = Map(file.name, table_top, settings.get_value("table_top_orientation")=="True")
     #draw the map
     map.draw_map()
     #get rid of all tokens
@@ -230,7 +238,7 @@ def add_token():
     file = filedialog.askopenfile(parent=root,mode="rb",title="Choose a file",  filetypes =(("Image Files", ("*.bmp","*.jpg","*.png")),("All Files","*.*")))
 
     #create a token where the right click was
-    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,table_top_orientation)) 
+    tokens.add(GameToken(file.name, table_top, map,right_click_x,right_click_y,settings.get_value("table_top_orientation")=="True")) 
 
     #redraw tokens  so the new one shows up
     # (will this cause all the other tokens to be doubled until they move again? 
@@ -295,9 +303,16 @@ def create_area_effect():
         for token in tokens:
             token.draw()
 
+#trying this one with a custom frame object instead of the whole window in another file
+def open_settings_screen():
+    settings_window = tk.Toplevel(root)
+    SettingsManagerFrame(settings_window, settings).pack()
+    root.wait_window(settings_window)
+
 
 def clear_drawing():
     destroy_by_tag("drawn_line")
+
 
 
 
@@ -330,6 +345,8 @@ menu.add_cascade(label="Token ...", menu=token_tools_menu)
 menu.add_command(label="Create Area Effect", command=create_area_effect)
 
 menu.add_separator()
+
+menu.add_command(label="Settings", command=open_settings_screen)
 
 menu.add_command(label="Exit", command=root.quit)
 
@@ -439,7 +456,7 @@ def mouse_moved(event):
     if mode=="rotating_area_effect":
         right_clicked_area_effect.rotate_by_mouse(event.x,event.y)
 
-    if debug == True:
+    if settings.get_value("debug") == "True":
         print_debug()
 
         
@@ -518,7 +535,7 @@ def left_mouse_button_drag(event):
 
 def left_mouse_button_drag_move(event):
 
-    if debug == True:
+    if settings.get_value("debug") == "True":
         print_debug()
 
     #calculate the distance between the starting point and the current point
@@ -562,7 +579,7 @@ def left_mouse_button_drag_move(event):
         tag="dragging_distance_message"
         )
 
-    if table_top_orientation==True:
+    if settings.get_value("table_top_orientation")=="True":
         #top, upside down
         table_top.create_rectangle(
             (table_top.winfo_width()/2)-100, 
@@ -686,7 +703,7 @@ def left_mouse_button_drag_erase(event):
 
 def left_mouse_button_release(event):
 
-    if debug==True:
+    if settings.get_value("debug") == "True":
         print_debug()
 
     if mode=="move":
@@ -766,7 +783,7 @@ root.bind_all("<ButtonRelease-3>", popup)
 ###############################################################################################
 
 #load title screen
-map = Map("./sample_assets/sample_dungeon_map.jpg", table_top, table_top_orientation)
+map = Map("./sample_assets/sample_dungeon_map.jpg", table_top, settings.get_value("table_top_orientation")=="True")
 map.draw_map()
 
 
