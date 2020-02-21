@@ -1,3 +1,19 @@
+## 2/14/2020 - Changes to movement system, area effects
+
+This was actually a pretty big change
+
+- Now instead of moving the tokens, you move a circle the size of the token, and then when you drop it the token moves. This pretty much solves the "snapping" issue, and it sets the program up better for multi step movement in the future.
+- Changed it so you can only move one token at a time. There is still a little bit of weirdness with moving a token that is under a token, but its much better. For that I'll probably just try to figure out how to do some sorting on the list of objects of possible.
+- Changed the "hit" detection (between the mouse and the tokens) to be in a circle, so you cant move a token by clicking a little bit outside of it on the corners.
+- Added area effects! This was a big change but it went pretty fast because I was able to reuse a lot of the token code. 
+    - You pick the shape, size, and color.
+    - The labels on the popup change for what makes most sense (based it on dnd 5e), so a circle has a radius, a cube has a "length" which is just the length of one side, a cone has a length, a "line" is just a rectangle, but unlike a cube it has a length and a width.
+    - I decided for moving them to put a 5 ft. circle at the origin and you have to click in there to move it, or right click in there to bring up the right click menu.
+    - Did I mention I added a right click menu? Delete or rotate area effects
+    - Yes... rotate.... no I still don't fully understand how it works, but I found some transformation code that uses complex numbers  somehow and I was able to make it work. When you rotate it, the hit box is still its original shape though, which is why I decided to have the circular movement area that I mentioned a couple points ago. 
+    
+I'm probably forgetting something. I'm writing this a few days after I actually did the code. I also tried to improve the drawing system but it failed :(
+
 ## 2/10/2020 - Lots of token changes
 
 - You can now add tokens via an image file from the right click menu just like maps
