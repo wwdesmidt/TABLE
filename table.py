@@ -147,16 +147,16 @@ def set_token_color_white(): right_clicked_token.set_color("white")
 def set_token_color_grey(): right_clicked_token.set_color("grey")
 
 #radius so send half of size
-def set_token_size_fine(): right_clicked_token.set_redius(0.25)
-def set_token_size_diminutive(): right_clicked_token.set_redius(0.5)
-def set_token_size_tiny(): right_clicked_token.set_redius(1.25)
-def set_token_size_small(): right_clicked_token.set_redius(2)
-def set_token_size_medium(): right_clicked_token.set_redius(2.5)
-def set_token_size_large(): right_clicked_token.set_redius(5)
-def set_token_size_huge(): right_clicked_token.set_redius(7.5)
-def set_token_size_gargantuan(): right_clicked_token.set_redius(10)
-def set_token_size_colossal(): right_clicked_token.set_redius(15)
-def set_token_size_wtf(): right_clicked_token.set_redius(50)
+def set_token_size_fine(): right_clicked_token.set_radius(0.25)
+def set_token_size_diminutive(): right_clicked_token.set_radius(0.5)
+def set_token_size_tiny(): right_clicked_token.set_radius(1.25)
+def set_token_size_small(): right_clicked_token.set_radius(2)
+def set_token_size_medium(): right_clicked_token.set_radius(2.5)
+def set_token_size_large(): right_clicked_token.set_radius(5)
+def set_token_size_huge(): right_clicked_token.set_radius(7.5)
+def set_token_size_gargantuan(): right_clicked_token.set_radius(10)
+def set_token_size_colossal(): right_clicked_token.set_radius(15)
+def set_token_size_wtf(): right_clicked_token.set_radius(50)
 
 
 
